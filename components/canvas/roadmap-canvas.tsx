@@ -24,6 +24,7 @@ import { DecisionNode } from '../nodes/decision-node';
 import { ResourceNode } from '../nodes/resource-node';
 import { ContentNode } from '../nodes/content-node';
 import { TreeNode } from '../nodes/tree-node';
+import { TableNode } from '../nodes/table-node';
 import { CanvasControls } from './canvas-controls';
 
 const nodeTypes = {
@@ -33,6 +34,7 @@ const nodeTypes = {
   resource: ResourceNode,
   content: ContentNode,
   tree: TreeNode,
+  table: TableNode,
 };
 
 const defaultEdgeOptions = {

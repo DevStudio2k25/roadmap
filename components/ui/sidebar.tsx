@@ -29,7 +29,8 @@ import {
   Filter,
   Flag,
   CheckSquare,
-  GitBranch
+  GitBranch,
+  Table
 } from 'lucide-react';
 import { cn } from '../../lib/utils/cn';
 
@@ -125,6 +126,14 @@ const nodeCollections = [
         icon: FileText,
         color: 'text-orange-600',
         preview: { title: 'API Guide', status: 'published', views: 1200 }
+      },
+      {
+        type: 'table',
+        name: 'Data Table',
+        description: 'Customizable table',
+        icon: Table,
+        color: 'text-indigo-600',
+        preview: { title: 'Project Data', rows: 3, columns: 4 }
       }
     ]
   },

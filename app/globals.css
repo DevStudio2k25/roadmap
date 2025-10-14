@@ -43,3 +43,36 @@ body {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Table styles for different variants */
+.table-default {
+  border-collapse: collapse;
+}
+
+.table-default th,
+.table-default td {
+  border: 1px solid #e5e7eb;
+}
+
+.table-striped tbody tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+.table-bordered {
+  border: 2px solid #d1d5db;
+}
+
+.table-bordered th,
+.table-bordered td {
+  border: 1px solid #d1d5db;
+}
+
+.table-minimal th,
+.table-minimal td {
+  border: none;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.table-minimal th {
+  border-bottom: 2px solid #e5e7eb;
+}

@@ -1,7 +1,7 @@
 // Core node types for the roadmap
 export interface RoadmapNode {
   id: string;
-  type: 'milestone' | 'task' | 'decision' | 'resource' | 'content';
+  type: 'milestone' | 'task' | 'decision' | 'resource' | 'content' | 'table';
   position: { x: number; y: number };
   data: {
     title: string;
@@ -12,9 +12,26 @@ export interface RoadmapNode {
     priority?: 'low' | 'medium' | 'high';
     tags?: string[];
     resources?: Resource[];
+    // Table-specific data
+    rows?: TableRow[];
+    columns?: number;
+    showHeaders?: boolean;
+    tableStyle?: 'default' | 'striped' | 'bordered' | 'minimal';
     createdAt: Date;
     updatedAt: Date;
   };
+}
+
+// Table-specific types
+export interface TableCell {
+  id: string;
+  content: string;
+  isHeader?: boolean;
+}
+
+export interface TableRow {
+  id: string;
+  cells: TableCell[];
 }
 
 // Learning resource types

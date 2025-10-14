@@ -3,9 +3,10 @@
 import { RoadmapCanvas } from '../components/canvas/roadmap-canvas';
 import { Sidebar } from '../components/ui/sidebar';
 import { useRoadmapStore } from '../lib/stores/roadmap-store';
+import { Button } from '../components/ui/button';
 
 export default function Home() {
-  const { sidebarOpen } = useRoadmapStore();
+  const { sidebarOpen, nodes, initializeSampleNodes } = useRoadmapStore();
 
   return (
     <div className="h-screen w-full bg-gray-50 dark:bg-gray-900 flex">
@@ -38,6 +39,15 @@ export default function Home() {
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 <span>Ready to create!</span>
               </div>
+              {nodes.length === 0 && (
+                <Button 
+                  onClick={initializeSampleNodes}
+                  variant="outline"
+                  size="sm"
+                >
+                  Load Sample Table
+                </Button>
+              )}
               <div className="flex items-center gap-2">
                 <span className="text-xs text-gray-400">v1.0.0</span>
               </div>
