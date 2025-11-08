@@ -49,21 +49,8 @@ export function TreeNode({ data, selected }: NodeProps) {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'border-green-400 bg-green-50 dark:bg-green-900/20';
-      case 'inactive':
-        return 'border-gray-400 bg-gray-50 dark:bg-gray-900/20';
-      case 'pending':
-        return 'border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20';
-      default:
-        return 'border-gray-400 bg-white dark:bg-gray-800';
-    }
-  };
 
-  const nodeWidth = Math.max(200, title.length * 8 + 80);
-  const indentLevel = level * 20;
+
 
   return (
     <div
@@ -71,7 +58,7 @@ export function TreeNode({ data, selected }: NodeProps) {
         'bg-white border-2 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 min-w-[180px] max-w-[260px] overflow-hidden bg-indigo-50',
         selected ? 'border-blue-400 ring-2 ring-blue-100' : 'border-indigo-200 hover:border-indigo-300'
       )}
-      style={{ marginLeft: `${indentLevel}px` }}
+
     >
       {/* Input Handles */}
       {showHandles && (

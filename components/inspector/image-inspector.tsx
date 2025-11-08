@@ -13,11 +13,11 @@ export function ImageInspector() {
     return null;
   }
 
-  const data = node.data as any;
-  const originalWidth = data.width || 400;
-  const originalHeight = data.height || 300;
-  const currentWidth = data.displayWidth || originalWidth;
-  const currentHeight = data.displayHeight || originalHeight;
+  const data = node.data as Record<string, unknown>;
+  const originalWidth = (data.width as number) || 400;
+  const originalHeight = (data.height as number) || 300;
+  const currentWidth = (data.displayWidth as number) || originalWidth;
+  const currentHeight = (data.displayHeight as number) || originalHeight;
   const aspectRatio = originalHeight / originalWidth;
 
   // Calculate display size (max 800px)
@@ -50,9 +50,9 @@ export function ImageInspector() {
     console.log('Found', imageNodes.length, 'other image nodes');
     
     imageNodes.forEach((n) => {
-      const nodeData = n.data as any;
-      const nodeOriginalWidth = nodeData.width || 400;
-      const nodeOriginalHeight = nodeData.height || 300;
+      const nodeData = n.data as Record<string, unknown>;
+      const nodeOriginalWidth = (nodeData.width as number) || 400;
+      const nodeOriginalHeight = (nodeData.height as number) || 300;
       
       // Apply same percentage scale
       const newWidth = nodeOriginalWidth * scalePercentage;

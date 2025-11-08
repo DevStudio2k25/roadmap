@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Handle, Position, NodeProps } from '@xyflow/react';
-import { CheckSquare, Square, Clock, User, Circle, Pause, AlertTriangle } from 'lucide-react';
+import { CheckSquare, Square, Clock, User, Circle, AlertTriangle } from 'lucide-react';
 import { cn } from '../../lib/utils/cn';
 
 interface TaskNodeData {

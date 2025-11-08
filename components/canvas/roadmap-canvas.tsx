@@ -7,10 +7,6 @@ import {
   Controls,
   MiniMap,
   Panel,
-  useNodesState,
-  useEdgesState,
-  addEdge,
-  Connection,
   Edge,
   Node,
   BackgroundVariant,
@@ -59,7 +55,6 @@ const defaultEdgeOptions = {
 const getEdgeStyle = (edge: Edge) => {
   // Different colors for different node types
   const sourceNode = edge.source;
-  const targetNode = edge.target;
   
   // Color palette
   const colors = {
@@ -96,6 +91,15 @@ const getEdgeStyle = (edge: Edge) => {
   };
 };
 
+interface SpacingIndicator {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  distance: number;
+  type: string;
+}
+
 export function RoadmapCanvas() {
   const {
     nodes,
@@ -103,12 +107,11 @@ export function RoadmapCanvas() {
     onNodesChange,
     onEdgesChange,
     onConnect,
-    selectedNode,
     setSelectedNode,
     addNode,
   } = useRoadmapStore();
 
-  const [spacingIndicators, setSpacingIndicators] = React.useState<any[]>([]);
+  const [spacingIndicators, setSpacingIndicators] = React.useState<SpacingIndicator[]>([]);
   const [isDragging, setIsDragging] = React.useState(false);
 
   // Apply custom styles to edges
@@ -126,14 +129,16 @@ export function RoadmapCanvas() {
 
     const dragX = draggingNode.position.x;
     const dragY = draggingNode.position.y;
-    const dragWidth = (draggingNode.data as any).displayWidth || (draggingNode.data as any).width || 300;
-    const dragHeight = (draggingNode.data as any).displayHeight || (draggingNode.data as any).height || 200;
+    const dragNodeData = draggingNode.data as { displayWidth?: number; width?: number; displayHeight?: number; height?: number };
+    const dragWidth = dragNodeData.displayWidth || dragNodeData.width || 300;
+    const dragHeight = dragNodeData.displayHeight || dragNodeData.height || 200;
 
     otherNodes.forEach(node => {
       const nodeX = node.position.x;
       const nodeY = node.position.y;
-      const nodeWidth = (node.data as any).displayWidth || (node.data as any).width || 300;
-      const nodeHeight = (node.data as any).displayHeight || (node.data as any).height || 200;
+      const nodeData = node.data as { displayWidth?: number; width?: number; displayHeight?: number; height?: number };
+      const nodeWidth = nodeData.displayWidth || nodeData.width || 300;
+      const nodeHeight = nodeData.displayHeight || nodeData.height || 200;
 
       // Horizontal spacing (left-right)
       const dragRight = dragX + dragWidth;
@@ -218,12 +223,12 @@ export function RoadmapCanvas() {
     [setSelectedNode]
   );
 
-  const onNodeDragStart = useCallback((event: React.MouseEvent, node: Node) => {
+  const onNodeDragStart = useCallback((_event: React.MouseEvent, node: Node) => {
     setIsDragging(true);
     console.log('🎯 Started dragging:', node.id);
   }, []);
 
-  const onNodeDrag = useCallback((event: React.MouseEvent, node: Node) => {
+  const onNodeDrag = useCallback((_event: React.MouseEvent, node: Node) => {
     const indicators = calculateSpacingIndicators(node.id);
     setSpacingIndicators(indicators);
   }, [calculateSpacingIndicators]);
@@ -248,7 +253,8 @@ export function RoadmapCanvas() {
           const img = JSON.parse(imageData);
           
           // Import smart positioning
-          const { findBestPosition } = require('../../lib/utils/canvas-helpers');
+          const canvasHelpers = await import('../../lib/utils/canvas-helpers');
+          const { findBestPosition } = canvasHelpers;
           
           // Find best position for new image
           const position = findBestPosition(nodes, img.width, img.height);
@@ -312,8 +318,7 @@ export function RoadmapCanvas() {
       {/* Spacing Indicators - Only When Dragging */}
       {showSpacingIndicators && isDragging && spacingIndicators.length > 0 && (
         <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 1000 }}>
-          {spacingIndicators.map((indicator: any, index: number) => {
-            const isHorizontal = indicator.type === 'horizontal';
+          {spacingIndicators.map((indicator: SpacingIndicator, index: number) => {
             const midX = (indicator.x1 + indicator.x2) / 2;
             const midY = (indicator.y1 + indicator.y2) / 2;
 

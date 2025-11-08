@@ -23,75 +23,7 @@ import {
 } from 'lucide-react';
 import { cn } from '../../lib/utils/cn';
 
-const nodeCollections = [
-  {
-    id: 'workflow',
-    name: 'Workflow',
-    nodes: [
-      {
-        type: 'milestone',
-        name: 'Milestone',
-        description: 'Key achievement',
-        icon: Flag,
-        color: 'text-blue-600',
-      },
-      {
-        type: 'task',
-        name: 'Task',
-        description: 'Action item',
-        icon: CheckSquare,
-        color: 'text-green-600',
-      },
-      {
-        type: 'decision',
-        name: 'Decision',
-        description: 'Choice point',
-        icon: GitBranch,
-        color: 'text-yellow-600',
-      }
-    ]
-  },
-  {
-    id: 'content',
-    name: 'Content',
-    nodes: [
-      {
-        type: 'resource',
-        name: 'Resource',
-        description: 'Learning material',
-        icon: BookOpen,
-        color: 'text-purple-600',
-      },
-      {
-        type: 'content',
-        name: 'Content',
-        description: 'Documentation',
-        icon: FileText,
-        color: 'text-orange-600',
-      },
-      {
-        type: 'table',
-        name: 'Table',
-        description: 'Data table',
-        icon: Table,
-        color: 'text-indigo-600',
-      }
-    ]
-  },
-  {
-    id: 'organization',
-    name: 'Organization',
-    nodes: [
-      {
-        type: 'tree',
-        name: 'Team',
-        description: 'Organization chart',
-        icon: Users,
-        color: 'text-indigo-600',
-      }
-    ]
-  }
-];
+
 
 export function Sidebar() {
   const { sidebarOpen, toggleSidebar, addNode, nodes } = useRoadmapStore();
@@ -161,7 +93,7 @@ export function Sidebar() {
         <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
           {sidebarOpen && (
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center" aria-hidden="true">
                 <span className="text-white font-bold text-sm">R</span>
               </div>
               <div>
@@ -268,7 +200,7 @@ export function Sidebar() {
 
                     {importedImages.length === 0 ? (
                       <div className="text-center py-12 px-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
-                        <Image className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                        <Image className="w-12 h-12 text-gray-400 mx-auto mb-3" aria-hidden="true" />
                         <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                           No images yet
                         </p>
@@ -295,7 +227,7 @@ export function Sidebar() {
                             >
                               <img
                                 src={img.url}
-                                alt={img.name}
+                                alt={img.name || 'Imported image'}
                                 className="w-full object-cover pointer-events-none"
                                 style={{ height: `${displayHeight}px` }}
                               />
@@ -738,8 +670,9 @@ export function Sidebar() {
               }}
               className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               title="Images"
+              aria-label="Open images tab"
             >
-              <Image className="w-4 h-4 text-purple-600" />
+              <Image className="w-4 h-4 text-purple-600" aria-hidden="true" />
             </button>
             <button
               onClick={() => {

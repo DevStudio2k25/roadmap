@@ -21,8 +21,8 @@ interface RoadmapStore {
   showHandles: boolean;
   
   // Actions for React Flow
-  onNodesChange: (changes: any) => void;
-  onEdgesChange: (changes: any) => void;
+  onNodesChange: (changes: unknown[]) => void;
+  onEdgesChange: (changes: unknown[]) => void;
   onConnect: (connection: Connection) => void;
   addNode: (node: Node) => void;
   updateNode: (id: string, data: Partial<RoadmapNode['data']>) => void;

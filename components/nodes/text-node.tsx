@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Handle, Position, NodeProps } from '@xyflow/react';
-import { Type, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { cn } from '../../lib/utils/cn';
 import { useRoadmapStore } from '../../lib/stores/roadmap-store';
 

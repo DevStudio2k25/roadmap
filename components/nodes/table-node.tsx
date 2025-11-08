@@ -5,13 +5,9 @@ import { Handle, Position, NodeProps } from '@xyflow/react';
 import { 
   Table, 
   Plus, 
-  Minus, 
   Edit3, 
   Check, 
   X, 
-  MoreHorizontal,
-  Trash2,
-  Copy,
   Settings
 } from 'lucide-react';
 import { cn } from '../../lib/utils/cn';
@@ -47,7 +43,6 @@ export function TableNode({ data, selected }: NodeProps) {
     description, 
     rows = [], 
     columns = 3, 
-    showHeaders = true,
     tableStyle = 'default'
   } = nodeData;
 
@@ -333,7 +328,7 @@ export function TableNode({ data, selected }: NodeProps) {
             getTableStyles()
           )}>
             <tbody>
-              {localRows.map((row, rowIndex) => (
+              {localRows.map((row) => (
                 <tr 
                   key={row.id}
                   className={cn(
@@ -517,7 +512,7 @@ export function TableNode({ data, selected }: NodeProps) {
             </div>
           ) : (
             <div className="text-xs text-gray-500 text-center">
-              Click "Edit" button to modify table structure and content
+              Click &quot;Edit&quot; button to modify table structure and content
             </div>
           )}
         </div>

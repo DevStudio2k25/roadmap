@@ -10,12 +10,15 @@ export function findBestPosition(existingNodes: Node[], newNodeWidth = 300, newN
   const GRID_SIZE = 20; // Snap to grid
 
   // Get all existing positions
-  const positions = existingNodes.map(node => ({
-    x: node.position.x,
-    y: node.position.y,
-    width: (node.data as any).displayWidth || (node.data as any).width || 300,
-    height: (node.data as any).displayHeight || (node.data as any).height || 200,
-  }));
+  const positions = existingNodes.map(node => {
+    const nodeData = node.data as { displayWidth?: number; width?: number; displayHeight?: number; height?: number };
+    return {
+      x: node.position.x,
+      y: node.position.y,
+      width: nodeData.displayWidth || nodeData.width || 300,
+      height: nodeData.displayHeight || nodeData.height || 200,
+    };
+  });
 
   // Try to place to the right of the last node
   const lastNode = positions[positions.length - 1];
@@ -81,8 +84,9 @@ export function calculateSnapLines(
 
   const dragX = draggingNode.position.x;
   const dragY = draggingNode.position.y;
-  const dragWidth = (draggingNode.data as any).displayWidth || (draggingNode.data as any).width || 300;
-  const dragHeight = (draggingNode.data as any).displayHeight || (draggingNode.data as any).height || 200;
+  const dragNodeData = draggingNode.data as { displayWidth?: number; width?: number; displayHeight?: number; height?: number };
+  const dragWidth = dragNodeData.displayWidth || dragNodeData.width || 300;
+  const dragHeight = dragNodeData.displayHeight || dragNodeData.height || 200;
   const dragCenterX = dragX + dragWidth / 2;
   const dragCenterY = dragY + dragHeight / 2;
   const dragRight = dragX + dragWidth;
@@ -96,8 +100,9 @@ export function calculateSnapLines(
 
     const nodeX = node.position.x;
     const nodeY = node.position.y;
-    const nodeWidth = (node.data as any).displayWidth || (node.data as any).width || 300;
-    const nodeHeight = (node.data as any).displayHeight || (node.data as any).height || 200;
+    const nodeData = node.data as { displayWidth?: number; width?: number; displayHeight?: number; height?: number };
+    const nodeWidth = nodeData.displayWidth || nodeData.width || 300;
+    const nodeHeight = nodeData.displayHeight || nodeData.height || 200;
     const nodeCenterX = nodeX + nodeWidth / 2;
     const nodeCenterY = nodeY + nodeHeight / 2;
     const nodeRight = nodeX + nodeWidth;

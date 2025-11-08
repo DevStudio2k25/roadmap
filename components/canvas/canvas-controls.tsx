@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useRoadmapStore } from '@/lib/stores/roadmap-store';
 import { useReactFlow, getNodesBounds, getViewportForBounds } from '@xyflow/react';
@@ -62,7 +62,6 @@ export function CanvasControls() {
         const canvas = document.querySelector('.react-flow') as HTMLElement;
         if (canvas) {
           // Simple screenshot approach
-          const rect = canvas.getBoundingClientRect();
           console.log('📸 Using fallback export method...');
           alert('🎉 Export initiated! Check your downloads folder.');
         }

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Handle, Position, NodeProps } from '@xyflow/react';
-import { FileText, Edit3, Eye, Archive, Pen } from 'lucide-react';
+import { Eye, Archive, Pen } from 'lucide-react';
 import { cn } from '../../lib/utils/cn';
 
 interface ContentNodeData {

@@ -46,9 +46,9 @@ export function TextInspector() {
     return null;
   }
 
-  const data = node.data as any;
+  const data = node.data as Record<string, unknown>;
 
-  const handleUpdate = (field: string, value: any) => {
+  const handleUpdate = (field: string, value: string | number) => {
     updateNode(node.id, { [field]: value });
   };
 

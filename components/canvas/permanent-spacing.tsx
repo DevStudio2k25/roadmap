@@ -12,7 +12,7 @@ export function PermanentSpacing({ nodes }: PermanentSpacingProps) {
   
   if (imageNodes.length < 2) return null;
 
-  const spacings: Array<{
+  interface Spacing {
     x1: number;
     y1: number;
     x2: number;
@@ -21,22 +21,26 @@ export function PermanentSpacing({ nodes }: PermanentSpacingProps) {
     type: 'horizontal' | 'vertical';
     node1: string;
     node2: string;
-  }> = [];
+  }
+
+  const spacings: Spacing[] = [];
 
   // Calculate all gaps between adjacent images
   imageNodes.forEach((node1, i) => {
     const x1 = node1.position.x;
     const y1 = node1.position.y;
-    const w1 = (node1.data as any).displayWidth || (node1.data as any).width || 300;
-    const h1 = (node1.data as any).displayHeight || (node1.data as any).height || 200;
+    const nodeData1 = node1.data as { displayWidth?: number; width?: number; displayHeight?: number; height?: number };
+    const w1 = nodeData1.displayWidth || nodeData1.width || 300;
+    const h1 = nodeData1.displayHeight || nodeData1.height || 200;
 
     imageNodes.forEach((node2, j) => {
       if (i >= j) return; // Avoid duplicates
 
       const x2 = node2.position.x;
       const y2 = node2.position.y;
-      const w2 = (node2.data as any).displayWidth || (node2.data as any).width || 300;
-      const h2 = (node2.data as any).displayHeight || (node2.data as any).height || 200;
+      const nodeData2 = node2.data as { displayWidth?: number; width?: number; displayHeight?: number; height?: number };
+      const w2 = nodeData2.displayWidth || nodeData2.width || 300;
+      const h2 = nodeData2.displayHeight || nodeData2.height || 200;
 
       // Horizontal spacing (side by side)
       const verticalOverlap = !(y1 + h1 < y2 || y2 + h2 < y1);

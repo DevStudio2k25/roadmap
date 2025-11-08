@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Handle, Position, NodeProps } from '@xyflow/react';
-import { BookOpen, ExternalLink, Youtube, FileText, Play, GraduationCap, Globe } from 'lucide-react';
+import { BookOpen, ExternalLink, Youtube, FileText, GraduationCap, Globe } from 'lucide-react';
 import { cn } from '../../lib/utils/cn';
 
 interface ResourceNodeData {
