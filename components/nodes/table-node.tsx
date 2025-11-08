@@ -37,8 +37,11 @@ interface TableNodeData {
   tableStyle: 'default' | 'striped' | 'bordered' | 'minimal';
 }
 
+import { useRoadmapStore } from '../../lib/stores/roadmap-store';
+
 export function TableNode({ data, selected }: NodeProps) {
   const nodeData = data as unknown as TableNodeData;
+  const { showHandles } = useRoadmapStore();
   const { 
     title = 'Data Table', 
     description, 
@@ -51,6 +54,8 @@ export function TableNode({ data, selected }: NodeProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editingCell, setEditingCell] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [titleValue, setTitleValue] = useState(title);
   const [localRows, setLocalRows] = useState<TableRow[]>(() => {
     if (rows && rows.length > 0) {
       return rows;
@@ -106,6 +111,22 @@ export function TableNode({ data, selected }: NodeProps) {
     setEditValue('');
   }, []);
 
+  const handleTitleEdit = useCallback(() => {
+    setIsEditingTitle(true);
+    setTitleValue(title);
+  }, [title]);
+
+  const handleTitleSave = useCallback(() => {
+    setIsEditingTitle(false);
+    // TODO: Update node data with new title
+    console.log('New title:', titleValue);
+  }, [titleValue]);
+
+  const handleTitleCancel = useCallback(() => {
+    setIsEditingTitle(false);
+    setTitleValue(title);
+  }, [title]);
+
   const addRow = useCallback(() => {
     const newRowId = `row-${Date.now()}`;
     const newRow: TableRow = {
@@ -157,31 +178,35 @@ export function TableNode({ data, selected }: NodeProps) {
   return (
     <div
       className={cn(
-        'bg-white border-2 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 min-w-[300px] max-w-[600px] overflow-hidden',
+        'bg-white border-2 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 min-w-[300px] max-w-[600px] overflow-hidden group',
         selected ? 'border-purple-400 ring-2 ring-purple-100' : 'border-gray-200 hover:border-gray-300'
       )}
     >
       {/* Input Handles */}
-      <Handle
-        type="target"
-        position={Position.Top}
-        id="input-1"
-        className="w-3 h-3 bg-purple-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-        style={{ left: '25%' }}
-      />
-      <Handle
-        type="target"
-        position={Position.Top}
-        id="input-2"
-        className="w-3 h-3 bg-purple-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-        style={{ left: '75%' }}
-      />
-      <Handle
-        type="target"
-        position={Position.Left}
-        id="input-left"
-        className="w-3 h-3 bg-purple-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-      />
+      {showHandles && (
+        <>
+          <Handle
+            type="target"
+            position={Position.Top}
+            id="input-1"
+            className="w-3 h-3 bg-purple-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            style={{ left: '25%' }}
+          />
+          <Handle
+            type="target"
+            position={Position.Top}
+            id="input-2"
+            className="w-3 h-3 bg-purple-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            style={{ left: '75%' }}
+          />
+          <Handle
+            type="target"
+            position={Position.Left}
+            id="input-left"
+            className="w-3 h-3 bg-purple-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+          />
+        </>
+      )}
       
       {/* Header */}
       <div className={cn(
@@ -196,14 +221,61 @@ export function TableNode({ data, selected }: NodeProps) {
               <Table className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 text-sm flex items-center gap-2">
-                {title}
-                {isEditing && (
+              <div className="flex items-center gap-2">
+                {isEditingTitle ? (
+                  <div className="flex items-center gap-1 flex-1">
+                    <input
+                      type="text"
+                      value={titleValue}
+                      onChange={(e) => setTitleValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleTitleSave();
+                        }
+                        if (e.key === 'Escape') {
+                          e.preventDefault();
+                          handleTitleCancel();
+                        }
+                      }}
+                      onBlur={handleTitleSave}
+                      className="text-sm font-semibold bg-white border border-blue-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500 min-w-[120px]"
+                      autoFocus
+                      placeholder="Table name..."
+                    />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleTitleSave}
+                      className="h-6 w-6 p-0"
+                    >
+                      <Check className="w-3 h-3 text-green-600" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleTitleCancel}
+                      className="h-6 w-6 p-0"
+                    >
+                      <X className="w-3 h-3 text-red-600" />
+                    </Button>
+                  </div>
+                ) : (
+                  <h3 
+                    className="font-semibold text-gray-900 text-sm flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors"
+                    onClick={handleTitleEdit}
+                    title="Click to edit table name"
+                  >
+                    {titleValue}
+                    <Edit3 className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </h3>
+                )}
+                {isEditing && !isEditingTitle && (
                   <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
                     Editing
                   </span>
                 )}
-              </h3>
+              </div>
               {description && (
                 <p className="text-xs text-gray-600 mt-0.5">
                   {description}
@@ -452,26 +524,30 @@ export function TableNode({ data, selected }: NodeProps) {
       </div>
       
       {/* Output Handles */}
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        id="output-1"
-        className="w-3 h-3 bg-purple-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-        style={{ left: '25%' }}
-      />
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        id="output-2"
-        className="w-3 h-3 bg-purple-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-        style={{ left: '75%' }}
-      />
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="output-right"
-        className="w-3 h-3 bg-purple-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-      />
+      {showHandles && (
+        <>
+          <Handle
+            type="source"
+            position={Position.Bottom}
+            id="output-1"
+            className="w-3 h-3 bg-purple-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            style={{ left: '25%' }}
+          />
+          <Handle
+            type="source"
+            position={Position.Bottom}
+            id="output-2"
+            className="w-3 h-3 bg-purple-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            style={{ left: '75%' }}
+          />
+          <Handle
+            type="source"
+            position={Position.Right}
+            id="output-right"
+            className="w-3 h-3 bg-purple-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+          />
+        </>
+      )}
     </div>
   );
 }

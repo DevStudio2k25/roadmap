@@ -16,8 +16,11 @@ interface TreeNodeData {
   level?: number;
 }
 
+import { useRoadmapStore } from '../../lib/stores/roadmap-store';
+
 export function TreeNode({ data, selected }: NodeProps) {
   const nodeData = data as unknown as TreeNodeData;
+  const { showHandles } = useRoadmapStore();
   const { 
     title, 
     subtitle, 
@@ -71,26 +74,30 @@ export function TreeNode({ data, selected }: NodeProps) {
       style={{ marginLeft: `${indentLevel}px` }}
     >
       {/* Input Handles */}
-      <Handle
-        type="target"
-        position={Position.Top}
-        id="input-1"
-        className="w-3 h-3 bg-indigo-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-        style={{ left: '25%' }}
-      />
-      <Handle
-        type="target"
-        position={Position.Top}
-        id="input-2"
-        className="w-3 h-3 bg-indigo-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-        style={{ left: '75%' }}
-      />
-      <Handle
-        type="target"
-        position={Position.Left}
-        id="input-left"
-        className="w-3 h-3 bg-indigo-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-      />
+      {showHandles && (
+        <>
+          <Handle
+            type="target"
+            position={Position.Top}
+            id="input-1"
+            className="w-3 h-3 bg-indigo-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            style={{ left: '25%' }}
+          />
+          <Handle
+            type="target"
+            position={Position.Top}
+            id="input-2"
+            className="w-3 h-3 bg-indigo-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            style={{ left: '75%' }}
+          />
+          <Handle
+            type="target"
+            position={Position.Left}
+            id="input-left"
+            className="w-3 h-3 bg-indigo-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+          />
+        </>
+      )}
       
       {/* Header */}
       <div className="px-4 py-2 border-b border-indigo-200 bg-indigo-50">
@@ -170,26 +177,30 @@ export function TreeNode({ data, selected }: NodeProps) {
       </div>
       
       {/* Output Handles */}
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        id="output-1"
-        className="w-3 h-3 bg-indigo-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-        style={{ left: '25%' }}
-      />
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        id="output-2"
-        className="w-3 h-3 bg-indigo-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-        style={{ left: '75%' }}
-      />
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="output-right"
-        className="w-3 h-3 bg-indigo-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-      />
+      {showHandles && (
+        <>
+          <Handle
+            type="source"
+            position={Position.Bottom}
+            id="output-1"
+            className="w-3 h-3 bg-indigo-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            style={{ left: '25%' }}
+          />
+          <Handle
+            type="source"
+            position={Position.Bottom}
+            id="output-2"
+            className="w-3 h-3 bg-indigo-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            style={{ left: '75%' }}
+          />
+          <Handle
+            type="source"
+            position={Position.Right}
+            id="output-right"
+            className="w-3 h-3 bg-indigo-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+          />
+        </>
+      )}
     </div>
   );
 }

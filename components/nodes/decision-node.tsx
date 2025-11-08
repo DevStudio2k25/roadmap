@@ -10,8 +10,11 @@ interface DecisionNodeData {
   description?: string;
 }
 
+import { useRoadmapStore } from '../../lib/stores/roadmap-store';
+
 export function DecisionNode({ data, selected }: NodeProps) {
   const nodeData = data as unknown as DecisionNodeData;
+  const { showHandles } = useRoadmapStore();
   const { title, description } = nodeData;
 
   return (
@@ -22,18 +25,22 @@ export function DecisionNode({ data, selected }: NodeProps) {
       )}
     >
       {/* Input Handles */}
-      <Handle
-        type="target"
-        position={Position.Top}
-        id="input-main"
-        className="w-3 h-3 bg-amber-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-      />
-      <Handle
-        type="target"
-        position={Position.Left}
-        id="input-left"
-        className="w-3 h-3 bg-amber-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-      />
+      {showHandles && (
+        <>
+          <Handle
+            type="target"
+            position={Position.Top}
+            id="input-main"
+            className="w-3 h-3 bg-amber-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+          />
+          <Handle
+            type="target"
+            position={Position.Left}
+            id="input-left"
+            className="w-3 h-3 bg-amber-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+          />
+        </>
+      )}
       
       {/* Header */}
       <div className="px-4 py-2 border-b border-amber-200 bg-amber-100">
@@ -73,20 +80,25 @@ export function DecisionNode({ data, selected }: NodeProps) {
         </div>
       </div>
       
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        id="yes"
-        className="w-3 h-3 bg-green-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-        style={{ left: '25%' }}
-      />
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        id="no"
-        className="w-3 h-3 bg-red-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-        style={{ left: '75%' }}
-      />
+      {/* Output Handles */}
+      {showHandles && (
+        <>
+          <Handle
+            type="source"
+            position={Position.Bottom}
+            id="yes"
+            className="w-3 h-3 bg-green-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            style={{ left: '25%' }}
+          />
+          <Handle
+            type="source"
+            position={Position.Bottom}
+            id="no"
+            className="w-3 h-3 bg-red-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            style={{ left: '75%' }}
+          />
+        </>
+      )}
     </div>
   );
 }

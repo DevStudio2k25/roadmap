@@ -13,8 +13,11 @@ interface MilestoneNodeData {
   dueDate?: string;
 }
 
+import { useRoadmapStore } from '../../lib/stores/roadmap-store';
+
 export function MilestoneNode({ data, selected }: NodeProps) {
   const nodeData = data as unknown as MilestoneNodeData;
+  const { showHandles } = useRoadmapStore();
   const { title, description, progress = 0, status = 'pending', dueDate } = nodeData;
 
   const getStatusConfig = (status: string) => {
@@ -66,26 +69,30 @@ export function MilestoneNode({ data, selected }: NodeProps) {
       )}
     >
       {/* Input Handles */}
-      <Handle
-        type="target"
-        position={Position.Top}
-        id="input-1"
-        className="w-3 h-3 bg-blue-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-        style={{ left: '25%' }}
-      />
-      <Handle
-        type="target"
-        position={Position.Top}
-        id="input-2"
-        className="w-3 h-3 bg-blue-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-        style={{ left: '75%' }}
-      />
-      <Handle
-        type="target"
-        position={Position.Left}
-        id="input-left"
-        className="w-3 h-3 bg-blue-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-      />
+      {showHandles && (
+        <>
+          <Handle
+            type="target"
+            position={Position.Top}
+            id="input-1"
+            className="w-3 h-3 bg-blue-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            style={{ left: '25%' }}
+          />
+          <Handle
+            type="target"
+            position={Position.Top}
+            id="input-2"
+            className="w-3 h-3 bg-blue-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            style={{ left: '75%' }}
+          />
+          <Handle
+            type="target"
+            position={Position.Left}
+            id="input-left"
+            className="w-3 h-3 bg-blue-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+          />
+        </>
+      )}
       
       {/* Header with status */}
       <div className={cn('px-4 py-2 border-b', statusConfig.borderColor)}>
@@ -139,26 +146,30 @@ export function MilestoneNode({ data, selected }: NodeProps) {
       </div>
       
       {/* Output Handles */}
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        id="output-1"
-        className="w-3 h-3 bg-blue-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-        style={{ left: '25%' }}
-      />
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        id="output-2"
-        className="w-3 h-3 bg-blue-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-        style={{ left: '75%' }}
-      />
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="output-right"
-        className="w-3 h-3 bg-blue-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-      />
+      {showHandles && (
+        <>
+          <Handle
+            type="source"
+            position={Position.Bottom}
+            id="output-1"
+            className="w-3 h-3 bg-blue-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            style={{ left: '25%' }}
+          />
+          <Handle
+            type="source"
+            position={Position.Bottom}
+            id="output-2"
+            className="w-3 h-3 bg-blue-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            style={{ left: '75%' }}
+          />
+          <Handle
+            type="source"
+            position={Position.Right}
+            id="output-right"
+            className="w-3 h-3 bg-blue-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+          />
+        </>
+      )}
     </div>
   );
 }

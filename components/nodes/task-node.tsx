@@ -14,8 +14,11 @@ interface TaskNodeData {
   estimatedTime?: string;
 }
 
+import { useRoadmapStore } from '../../lib/stores/roadmap-store';
+
 export function TaskNode({ data, selected }: NodeProps) {
   const nodeData = data as unknown as TaskNodeData;
+  const { showHandles } = useRoadmapStore();
   const { title, description, status = 'pending', priority = 'medium', assignee, estimatedTime } = nodeData;
 
   const getPriorityConfig = (priority: string) => {
@@ -94,26 +97,30 @@ export function TaskNode({ data, selected }: NodeProps) {
       )}
     >
       {/* Input Handles */}
-      <Handle
-        type="target"
-        position={Position.Top}
-        id="input-1"
-        className="w-3 h-3 bg-green-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-        style={{ left: '30%' }}
-      />
-      <Handle
-        type="target"
-        position={Position.Top}
-        id="input-2"
-        className="w-3 h-3 bg-green-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-        style={{ left: '70%' }}
-      />
-      <Handle
-        type="target"
-        position={Position.Left}
-        id="input-left"
-        className="w-3 h-3 bg-green-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-      />
+      {showHandles && (
+        <>
+          <Handle
+            type="target"
+            position={Position.Top}
+            id="input-1"
+            className="w-3 h-3 bg-green-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            style={{ left: '30%' }}
+          />
+          <Handle
+            type="target"
+            position={Position.Top}
+            id="input-2"
+            className="w-3 h-3 bg-green-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            style={{ left: '70%' }}
+          />
+          <Handle
+            type="target"
+            position={Position.Left}
+            id="input-left"
+            className="w-3 h-3 bg-green-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+          />
+        </>
+      )}
       
       {/* Header */}
       <div className="px-4 py-3 bg-white border-b border-gray-100">
@@ -166,26 +173,30 @@ export function TaskNode({ data, selected }: NodeProps) {
       </div>
       
       {/* Output Handles */}
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        id="output-1"
-        className="w-3 h-3 bg-green-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-        style={{ left: '30%' }}
-      />
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        id="output-2"
-        className="w-3 h-3 bg-green-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-        style={{ left: '70%' }}
-      />
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="output-right"
-        className="w-3 h-3 bg-green-500 border-2 border-white rounded-full opacity-0 hover:opacity-100 transition-opacity"
-      />
+      {showHandles && (
+        <>
+          <Handle
+            type="source"
+            position={Position.Bottom}
+            id="output-1"
+            className="w-3 h-3 bg-green-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            style={{ left: '30%' }}
+          />
+          <Handle
+            type="source"
+            position={Position.Bottom}
+            id="output-2"
+            className="w-3 h-3 bg-green-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            style={{ left: '70%' }}
+          />
+          <Handle
+            type="source"
+            position={Position.Right}
+            id="output-right"
+            className="w-3 h-3 bg-green-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+          />
+        </>
+      )}
     </div>
   );
 }

@@ -1,84 +1,32 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from './button';
 import { useRoadmapStore } from '../../lib/stores/roadmap-store';
 import { 
   ChevronLeft,
   ChevronRight,
-  Search,
   Plus,
-  Folder,
-  FolderOpen,
-  Star,
-  Clock,
-  Users,
   BookOpen,
-  Video,
   FileText,
-  Code,
-  Lightbulb,
-  Target,
-  Zap,
-  Globe,
-  Github,
-  Youtube,
-  Twitter,
-  Link,
-  Tag,
-  Filter,
   Flag,
   CheckSquare,
   GitBranch,
-  Table
+  Table,
+  Image,
+  Upload,
+  Trash2,
+  Users,
+  Layers,
+  Info,
+  Type
 } from 'lucide-react';
 import { cn } from '../../lib/utils/cn';
-
-const resourceCategories = [
-  {
-    id: 'learning',
-    name: 'Learning Resources',
-    icon: BookOpen,
-    color: 'text-blue-600',
-    items: [
-      { name: 'YouTube Channels', icon: Youtube, count: 25, color: 'text-red-500' },
-      { name: 'Online Courses', icon: Video, count: 12, color: 'text-purple-500' },
-      { name: 'Documentation', icon: FileText, count: 18, color: 'text-gray-600' },
-      { name: 'Tutorials', icon: Lightbulb, count: 34, color: 'text-yellow-500' },
-      { name: 'Code Examples', icon: Code, count: 45, color: 'text-green-500' },
-    ]
-  },
-  {
-    id: 'projects',
-    name: 'Projects & Goals',
-    icon: Target,
-    color: 'text-green-600',
-    items: [
-      { name: 'Active Projects', icon: Zap, count: 8, color: 'text-orange-500' },
-      { name: 'Completed', icon: Star, count: 15, color: 'text-yellow-500' },
-      { name: 'Planning', icon: Clock, count: 6, color: 'text-blue-500' },
-      { name: 'Templates', icon: Folder, count: 12, color: 'text-purple-500' },
-    ]
-  },
-  {
-    id: 'community',
-    name: 'Community & Social',
-    icon: Users,
-    color: 'text-purple-600',
-    items: [
-      { name: 'GitHub Repos', icon: Github, count: 23, color: 'text-gray-800' },
-      { name: 'Twitter Threads', icon: Twitter, count: 17, color: 'text-blue-400' },
-      { name: 'Useful Links', icon: Link, count: 31, color: 'text-indigo-500' },
-      { name: 'Communities', icon: Globe, count: 9, color: 'text-green-600' },
-    ]
-  }
-];
 
 const nodeCollections = [
   {
     id: 'workflow',
-    name: 'Workflow Nodes',
-    description: 'Basic workflow elements',
+    name: 'Workflow',
     nodes: [
       {
         type: 'milestone',
@@ -86,7 +34,6 @@ const nodeCollections = [
         description: 'Key achievement',
         icon: Flag,
         color: 'text-blue-600',
-        preview: { title: 'Project Launch', status: 'completed', progress: 100 }
       },
       {
         type: 'task',
@@ -94,7 +41,6 @@ const nodeCollections = [
         description: 'Action item',
         icon: CheckSquare,
         color: 'text-green-600',
-        preview: { title: 'Design Review', status: 'in-progress', priority: 'high' }
       },
       {
         type: 'decision',
@@ -102,14 +48,12 @@ const nodeCollections = [
         description: 'Choice point',
         icon: GitBranch,
         color: 'text-yellow-600',
-        preview: { title: 'Tech Stack?', description: 'React vs Vue' }
       }
     ]
   },
   {
     id: 'content',
-    name: 'Content & Resources',
-    description: 'Learning and documentation',
+    name: 'Content',
     nodes: [
       {
         type: 'resource',
@@ -117,7 +61,6 @@ const nodeCollections = [
         description: 'Learning material',
         icon: BookOpen,
         color: 'text-purple-600',
-        preview: { title: 'React Tutorial', type: 'youtube', difficulty: 'beginner' }
       },
       {
         type: 'content',
@@ -125,22 +68,19 @@ const nodeCollections = [
         description: 'Documentation',
         icon: FileText,
         color: 'text-orange-600',
-        preview: { title: 'API Guide', status: 'published', views: 1200 }
       },
       {
         type: 'table',
-        name: 'Data Table',
-        description: 'Customizable table',
+        name: 'Table',
+        description: 'Data table',
         icon: Table,
         color: 'text-indigo-600',
-        preview: { title: 'Project Data', rows: 3, columns: 4 }
       }
     ]
   },
   {
     id: 'organization',
     name: 'Organization',
-    description: 'Team and structure',
     nodes: [
       {
         type: 'tree',
@@ -148,31 +88,16 @@ const nodeCollections = [
         description: 'Organization chart',
         icon: Users,
         color: 'text-indigo-600',
-        preview: { title: 'Frontend Team', type: 'team', status: 'active' }
       }
     ]
   }
 ];
 
-const recentItems = [
-  { name: 'React Roadmap 2024', type: 'roadmap', time: '2 hours ago', color: 'bg-blue-100 text-blue-800' },
-  { name: 'JavaScript Fundamentals', type: 'learning', time: '1 day ago', color: 'bg-yellow-100 text-yellow-800' },
-  { name: 'Next.js Best Practices', type: 'resource', time: '3 days ago', color: 'bg-green-100 text-green-800' },
-  { name: 'TypeScript Guide', type: 'tutorial', time: '1 week ago', color: 'bg-purple-100 text-purple-800' },
-];
-
 export function Sidebar() {
-  const { sidebarOpen, toggleSidebar, addNode } = useRoadmapStore();
-  const [expandedCategories, setExpandedCategories] = useState<string[]>(['learning', 'workflow']);
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const toggleCategory = (categoryId: string) => {
-    setExpandedCategories(prev => 
-      prev.includes(categoryId) 
-        ? prev.filter(id => id !== categoryId)
-        : [...prev, categoryId]
-    );
-  };
+  const { sidebarOpen, toggleSidebar, addNode, nodes } = useRoadmapStore();
+  const [activeTab, setActiveTab] = useState<'images' | 'text' | 'nodes' | 'info'>('images');
+  const [importedImages, setImportedImages] = useState<Array<{ id: string; name: string; url: string; size: string; width: number; height: number }>>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleAddNode = (type: string) => {
     const timestamp = Date.now();
@@ -190,6 +115,41 @@ export function Sidebar() {
     addNode(newNode);
   };
 
+  const handleImageImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    
+    for (const file of files) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new window.Image();
+        img.onload = () => {
+          const newImage = {
+            id: `img-${Date.now()}-${Math.random()}`,
+            name: file.name,
+            url: event.target?.result as string,
+            size: `${(file.size / 1024).toFixed(1)} KB`,
+            width: img.width,
+            height: img.height,
+          };
+          setImportedImages(prev => [...prev, newImage]);
+        };
+        img.src = event.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveImage = (id: string) => {
+    setImportedImages(prev => prev.filter(img => img.id !== id));
+  };
+
+  const imageNodes = nodes.filter(n => n.type === 'image');
+  const otherNodes = nodes.filter(n => n.type !== 'image');
+
   return (
     <>
       {/* Sidebar */}
@@ -206,10 +166,10 @@ export function Sidebar() {
               </div>
               <div>
                 <h2 className="font-semibold text-gray-900 dark:text-white text-sm">
-                  Resources
+                  Roadmap
                 </h2>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Learning Hub
+                  Creator
                 </p>
               </div>
             </div>
@@ -230,207 +190,540 @@ export function Sidebar() {
 
         {sidebarOpen && (
           <>
-            {/* Search */}
-            <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search resources..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              <div className="flex gap-2 mt-3">
-                <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
-                  <Filter className="w-3 h-3 mr-1" />
-                  Filter
-                </Button>
-                <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
-                  <Tag className="w-3 h-3 mr-1" />
-                  Tags
-                </Button>
-              </div>
+            {/* Tabs */}
+            <div className="flex border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+              <button
+                onClick={() => setActiveTab('images')}
+                className={cn(
+                  'flex-1 px-3 py-3 text-xs font-medium transition-colors flex items-center justify-center gap-1.5',
+                  activeTab === 'images'
+                    ? 'text-purple-600 dark:text-purple-400 bg-white dark:bg-gray-900 border-b-2 border-purple-600'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                )}
+              >
+                <Image className="w-3.5 h-3.5" />
+                Images
+              </button>
+              <button
+                onClick={() => setActiveTab('text')}
+                className={cn(
+                  'flex-1 px-3 py-3 text-xs font-medium transition-colors flex items-center justify-center gap-1.5',
+                  activeTab === 'text'
+                    ? 'text-cyan-600 dark:text-cyan-400 bg-white dark:bg-gray-900 border-b-2 border-cyan-600'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                )}
+              >
+                <Type className="w-3.5 h-3.5" />
+                Text
+              </button>
+              <button
+                onClick={() => setActiveTab('nodes')}
+                className={cn(
+                  'flex-1 px-3 py-3 text-xs font-medium transition-colors flex items-center justify-center gap-1.5',
+                  activeTab === 'nodes'
+                    ? 'text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-900 border-b-2 border-blue-600'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                )}
+              >
+                <Layers className="w-3.5 h-3.5" />
+                Nodes
+              </button>
+              <button
+                onClick={() => setActiveTab('info')}
+                className={cn(
+                  'flex-1 px-3 py-3 text-xs font-medium transition-colors flex items-center justify-center gap-1.5',
+                  activeTab === 'info'
+                    ? 'text-green-600 dark:text-green-400 bg-white dark:bg-gray-900 border-b-2 border-green-600'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                )}
+              >
+                <Info className="w-3.5 h-3.5" />
+                Info
+              </button>
             </div>
 
-            {/* Categories */}
+            {/* Tab Content */}
             <div className="flex-1 overflow-y-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                    Categories
-                  </h3>
-                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                    <Plus className="w-3 h-3" />
-                  </Button>
-                </div>
-
-                <div className="space-y-2">
-                  {resourceCategories.map((category) => {
-                    const isExpanded = expandedCategories.includes(category.id);
-                    const CategoryIcon = category.icon;
-                    
-                    return (
-                      <div key={category.id}>
-                        <button
-                          onClick={() => toggleCategory(category.id)}
-                          className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                        >
-                          <div className="flex items-center gap-2 flex-1">
-                            {isExpanded ? (
-                              <FolderOpen className="w-4 h-4 text-gray-400" />
-                            ) : (
-                              <Folder className="w-4 h-4 text-gray-400" />
-                            )}
-                            <CategoryIcon className={cn('w-4 h-4', category.color)} />
-                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                              {category.name}
-                            </span>
-                          </div>
-                          <ChevronRight className={cn(
-                            'w-3 h-3 text-gray-400 transition-transform',
-                            isExpanded && 'rotate-90'
-                          )} />
-                        </button>
-
-                        {isExpanded && (
-                          <div className="ml-6 mt-1 space-y-1">
-                            {category.items.map((item) => {
-                              const ItemIcon = item.icon;
-                              return (
-                                <div
-                                  key={item.name}
-                                  className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer group"
-                                >
-                                  <ItemIcon className={cn('w-3 h-3', item.color)} />
-                                  <span className="text-xs text-gray-600 dark:text-gray-400 flex-1">
-                                    {item.name}
-                                  </span>
-                                  <span className="text-xs text-gray-400 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded-full">
-                                    {item.count}
-                                  </span>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Add Nodes Section */}
-              <div className="mt-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                    Node Collections
-                  </h3>
-                </div>
-
-                <div className="space-y-4">
-                  {nodeCollections.map((collection) => {
-                    const isExpanded = expandedCategories.includes(collection.id);
-                    
-                    return (
-                      <div key={collection.id}>
-                        <button
-                          onClick={() => toggleCategory(collection.id)}
-                          className="w-full flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                        >
-                          <div className="text-left">
-                            <h4 className="text-sm font-medium text-gray-900 dark:text-white">
-                              {collection.name}
-                            </h4>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {collection.description}
-                            </p>
-                          </div>
-                          <ChevronRight className={cn(
-                            'w-4 h-4 text-gray-400 transition-transform',
-                            isExpanded && 'rotate-90'
-                          )} />
-                        </button>
-
-                        {isExpanded && (
-                          <div className="mt-2 grid grid-cols-1 gap-2">
-                            {collection.nodes.map((node) => {
-                              const NodeIcon = node.icon;
-                              return (
-                                <button
-                                  key={node.type}
-                                  onClick={() => handleAddNode(node.type)}
-                                  className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 hover:shadow-sm group text-left"
-                                  title={node.description}
-                                >
-                                  <div className="flex items-center gap-3">
-                                    <div className="flex-shrink-0">
-                                      <NodeIcon className={cn('w-4 h-4', node.color)} />
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                      <div className="flex items-center justify-between">
-                                        <span className="text-sm font-medium text-gray-900 dark:text-white">
-                                          {node.name}
-                                        </span>
-                                        <Plus className="w-3 h-3 text-gray-400 group-hover:text-gray-600" />
-                                      </div>
-                                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                                        {node.preview.title}
-                                      </p>
-                                    </div>
-                                  </div>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Recent Items */}
-              <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-                  Recent
-                </h3>
-                <div className="space-y-2">
-                  {recentItems.map((item, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+              {/* Images Tab */}
+              {activeTab === 'images' && (
+                <div className="p-4">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageImport}
+                    className="hidden"
+                  />
+                  
+                  <div className="space-y-3">
+                    <Button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full gap-2"
+                      size="sm"
                     >
-                      <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">
-                          {item.name}
+                      <Upload className="w-4 h-4" />
+                      Import Images
+                    </Button>
+
+                    {importedImages.length === 0 ? (
+                      <div className="text-center py-12 px-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
+                        <Image className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                        <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                          No images yet
                         </p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className={cn(
-                            'text-xs px-1.5 py-0.5 rounded-full font-medium',
-                            item.color
-                          )}>
-                            {item.type}
-                          </span>
-                          <span className="text-xs text-gray-400">
-                            {item.time}
-                          </span>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                          Click Import to add images
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-2">
+                        {importedImages.map((img) => {
+                          const aspectRatio = img.height / img.width;
+                          const displayHeight = Math.min(Math.max(aspectRatio * 140, 80), 200);
+                          
+                          return (
+                            <div
+                              key={img.id}
+                              className="group relative bg-white dark:bg-gray-700 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600 hover:border-purple-400 transition-colors cursor-grab active:cursor-grabbing"
+                              draggable
+                              onDragStart={(e) => {
+                                e.dataTransfer.setData('imageData', JSON.stringify(img));
+                                e.dataTransfer.effectAllowed = 'copy';
+                              }}
+                              title="Drag to canvas"
+                            >
+                              <img
+                                src={img.url}
+                                alt={img.name}
+                                className="w-full object-cover pointer-events-none"
+                                style={{ height: `${displayHeight}px` }}
+                              />
+                              <div className="p-2">
+                                <p className="text-xs text-gray-600 dark:text-gray-300 truncate" title={img.name}>
+                                  {img.name}
+                                </p>
+                                <p className="text-xs text-gray-400 dark:text-gray-500">
+                                  {img.width} × {img.height}
+                                </p>
+                              </div>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRemoveImage(img.id);
+                                }}
+                                className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                                title="Remove image"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Text Tab */}
+              {activeTab === 'text' && (
+                <div className="p-4">
+                  <div className="space-y-3">
+                    <div className="bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-lg p-4 border border-cyan-200 dark:border-cyan-800">
+                      <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                        <Type className="w-4 h-4 text-cyan-600" />
+                        Text Nodes
+                      </h4>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
+                        Click to add customizable text to your canvas
+                      </p>
+                      <Button
+                        onClick={() => {
+                          const timestamp = Date.now();
+                          const newNode = {
+                            id: `text-${timestamp}`,
+                            type: 'text',
+                            position: { x: 250, y: 150 },
+                            data: {
+                              text: 'Home Page',
+                              fontSize: 24,
+                              fontFamily: 'Inter',
+                              fontWeight: '600',
+                              textColor: '#1f2937',
+                              backgroundColor: '#ffffff',
+                              padding: 16,
+                              borderRadius: 8,
+                              borderWidth: 1,
+                              borderColor: '#e5e7eb',
+                              textAlign: 'center',
+                              width: 200,
+                              opacity: 1,
+                              shadow: 'md',
+                              createdAt: new Date(timestamp),
+                              updatedAt: new Date(timestamp),
+                            },
+                          };
+                          addNode(newNode);
+                        }}
+                        className="w-full gap-2 bg-cyan-600 hover:bg-cyan-700"
+                        size="sm"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Add Text Node
+                      </Button>
+                    </div>
+
+                    {/* Text Presets */}
+                    <div>
+                      <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+                        Quick Presets
+                      </h4>
+                      <div className="grid grid-cols-1 gap-2">
+                        {/* Heading Preset */}
+                        <button
+                          onClick={() => {
+                            const timestamp = Date.now();
+                            addNode({
+                              id: `text-${timestamp}`,
+                              type: 'text',
+                              position: { x: 250, y: 150 },
+                              data: {
+                                text: 'Heading',
+                                fontSize: 32,
+                                fontFamily: 'Inter',
+                                fontWeight: '700',
+                                textColor: '#111827',
+                                backgroundColor: 'transparent',
+                                padding: 8,
+                                borderRadius: 0,
+                                borderWidth: 0,
+                                borderColor: '#e5e7eb',
+                                textAlign: 'left',
+                                width: 300,
+                                opacity: 1,
+                                shadow: 'none',
+                              },
+                            });
+                          }}
+                          className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all text-left"
+                        >
+                          <div className="text-lg font-bold text-gray-900 dark:text-white mb-1">Heading</div>
+                          <p className="text-xs text-gray-500">Large bold text</p>
+                        </button>
+
+                        {/* Label Preset */}
+                        <button
+                          onClick={() => {
+                            const timestamp = Date.now();
+                            addNode({
+                              id: `text-${timestamp}`,
+                              type: 'text',
+                              position: { x: 250, y: 150 },
+                              data: {
+                                text: 'Label',
+                                fontSize: 14,
+                                fontFamily: 'Inter',
+                                fontWeight: '500',
+                                textColor: '#ffffff',
+                                backgroundColor: '#3b82f6',
+                                padding: 8,
+                                borderRadius: 6,
+                                borderWidth: 0,
+                                borderColor: '#e5e7eb',
+                                textAlign: 'center',
+                                width: 120,
+                                opacity: 1,
+                                shadow: 'sm',
+                              },
+                            });
+                          }}
+                          className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all text-left"
+                        >
+                          <div className="inline-block px-3 py-1 bg-blue-500 text-white text-sm font-medium rounded mb-1">Label</div>
+                          <p className="text-xs text-gray-500">Colored badge</p>
+                        </button>
+
+                        {/* Note Preset */}
+                        <button
+                          onClick={() => {
+                            const timestamp = Date.now();
+                            addNode({
+                              id: `text-${timestamp}`,
+                              type: 'text',
+                              position: { x: 250, y: 150 },
+                              data: {
+                                text: 'Note: Add your description here',
+                                fontSize: 14,
+                                fontFamily: 'Inter',
+                                fontWeight: '400',
+                                textColor: '#6b7280',
+                                backgroundColor: '#fef3c7',
+                                padding: 12,
+                                borderRadius: 8,
+                                borderWidth: 1,
+                                borderColor: '#fbbf24',
+                                textAlign: 'left',
+                                width: 250,
+                                opacity: 1,
+                                shadow: 'sm',
+                              },
+                            });
+                          }}
+                          className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all text-left"
+                        >
+                          <div className="text-sm text-gray-600 bg-yellow-100 border border-yellow-300 rounded p-2 mb-1">Note</div>
+                          <p className="text-xs text-gray-500">Sticky note style</p>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Nodes Tab */}
+              {activeTab === 'nodes' && (
+                <div className="p-4">
+                  <div className="space-y-4">
+                    {/* Workflow Section */}
+                    <div>
+                      <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+                        Workflow
+                      </h4>
+                      <div className="grid grid-cols-1 gap-2">
+                        {/* Milestone Preset */}
+                        <button
+                          onClick={() => handleAddNode('milestone')}
+                          className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 transition-all text-left group"
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="p-1.5 rounded-lg bg-blue-500">
+                              <Flag className="w-3 h-3 text-white" />
+                            </div>
+                            <span className="text-sm font-semibold text-gray-900 dark:text-white">Milestone</span>
+                          </div>
+                          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-2">
+                            <div className="text-xs font-medium text-blue-900 dark:text-blue-100 mb-1">Project Launch</div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-12 bg-blue-200 dark:bg-blue-700 rounded-full h-1.5">
+                                <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: '60%' }}></div>
+                              </div>
+                              <span className="text-xs text-blue-600 dark:text-blue-400">60%</span>
+                            </div>
+                          </div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Track key achievements</p>
+                        </button>
+
+                        {/* Task Preset */}
+                        <button
+                          onClick={() => handleAddNode('task')}
+                          className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-green-50 dark:hover:bg-green-900/20 hover:border-green-300 transition-all text-left group"
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="p-1.5 rounded-lg bg-green-500">
+                              <CheckSquare className="w-3 h-3 text-white" />
+                            </div>
+                            <span className="text-sm font-semibold text-gray-900 dark:text-white">Task</span>
+                          </div>
+                          <div className="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 rounded-lg p-2">
+                            <div className="text-xs font-medium text-green-900 dark:text-green-100 mb-1">Complete Design</div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                              <span className="text-xs text-green-600 dark:text-green-400">High Priority</span>
+                            </div>
+                          </div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Action items to complete</p>
+                        </button>
+
+                        {/* Decision Preset */}
+                        <button
+                          onClick={() => handleAddNode('decision')}
+                          className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:border-amber-300 transition-all text-left group"
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="p-1.5 rounded-lg bg-amber-500">
+                              <GitBranch className="w-3 h-3 text-white" />
+                            </div>
+                            <span className="text-sm font-semibold text-gray-900 dark:text-white">Decision</span>
+                          </div>
+                          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-2">
+                            <div className="text-xs font-medium text-amber-900 dark:text-amber-100 mb-1.5">Approve Design?</div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Yes</span>
+                              <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">No</span>
+                            </div>
+                          </div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Choice points in flow</p>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Content Section */}
+                    <div>
+                      <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+                        Content
+                      </h4>
+                      <div className="grid grid-cols-1 gap-2">
+                        {/* Resource Preset */}
+                        <button
+                          onClick={() => handleAddNode('resource')}
+                          className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:border-purple-300 transition-all text-left group"
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="p-1.5 rounded-lg bg-purple-500">
+                              <BookOpen className="w-3 h-3 text-white" />
+                            </div>
+                            <span className="text-sm font-semibold text-gray-900 dark:text-white">Resource</span>
+                          </div>
+                          <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-2">
+                            <div className="text-xs font-medium text-purple-900 dark:text-purple-100 mb-1">React Tutorial</div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Course</span>
+                              <span className="text-xs text-purple-600 dark:text-purple-400">Beginner</span>
+                            </div>
+                          </div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Learning materials</p>
+                        </button>
+
+                        {/* Content Preset */}
+                        <button
+                          onClick={() => handleAddNode('content')}
+                          className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:border-orange-300 transition-all text-left group"
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="p-1.5 rounded-lg bg-orange-500">
+                              <FileText className="w-3 h-3 text-white" />
+                            </div>
+                            <span className="text-sm font-semibold text-gray-900 dark:text-white">Content</span>
+                          </div>
+                          <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-2">
+                            <div className="text-xs font-medium text-orange-900 dark:text-orange-100 mb-1">Documentation</div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Published</span>
+                            </div>
+                          </div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Documentation & notes</p>
+                        </button>
+
+                        {/* Table Preset */}
+                        <button
+                          onClick={() => handleAddNode('table')}
+                          className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:border-indigo-300 transition-all text-left group"
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="p-1.5 rounded-lg bg-indigo-500">
+                              <Table className="w-3 h-3 text-white" />
+                            </div>
+                            <span className="text-sm font-semibold text-gray-900 dark:text-white">Table</span>
+                          </div>
+                          <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg p-2">
+                            <div className="grid grid-cols-3 gap-1 mb-1">
+                              <div className="h-1.5 bg-indigo-300 dark:bg-indigo-600 rounded"></div>
+                              <div className="h-1.5 bg-indigo-300 dark:bg-indigo-600 rounded"></div>
+                              <div className="h-1.5 bg-indigo-300 dark:bg-indigo-600 rounded"></div>
+                            </div>
+                            <div className="grid grid-cols-3 gap-1">
+                              <div className="h-1 bg-indigo-200 dark:bg-indigo-700 rounded"></div>
+                              <div className="h-1 bg-indigo-200 dark:bg-indigo-700 rounded"></div>
+                              <div className="h-1 bg-indigo-200 dark:bg-indigo-700 rounded"></div>
+                            </div>
+                          </div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Structured data tables</p>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Organization Section */}
+                    <div>
+                      <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+                        Organization
+                      </h4>
+                      <div className="grid grid-cols-1 gap-2">
+                        {/* Tree Preset */}
+                        <button
+                          onClick={() => handleAddNode('tree')}
+                          className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:border-indigo-300 transition-all text-left group"
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="p-1.5 rounded-lg bg-indigo-500">
+                              <Users className="w-3 h-3 text-white" />
+                            </div>
+                            <span className="text-sm font-semibold text-gray-900 dark:text-white">Team</span>
+                          </div>
+                          <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg p-2">
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className="w-5 h-5 rounded-full bg-indigo-500 flex items-center justify-center">
+                                <span className="text-white text-xs font-bold">T</span>
+                              </div>
+                              <div className="text-xs font-medium text-indigo-900 dark:text-indigo-100">Team Lead</div>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                              <span className="text-xs text-indigo-600 dark:text-indigo-400">Active</span>
+                            </div>
+                          </div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Organization charts</p>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Info Tab */}
+              {activeTab === 'info' && (
+                <div className="p-4">
+                  <div className="space-y-4">
+                    <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
+                      <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                        Canvas Stats
+                      </h4>
+                      <div className="space-y-2 text-xs text-gray-600 dark:text-gray-400">
+                        <div className="flex justify-between">
+                          <span>Total Nodes:</span>
+                          <span className="font-semibold text-gray-900 dark:text-white">{nodes.length}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Image Nodes:</span>
+                          <span className="font-semibold text-purple-600 dark:text-purple-400">{imageNodes.length}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Other Nodes:</span>
+                          <span className="font-semibold text-blue-600 dark:text-blue-400">{otherNodes.length}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Images Library:</span>
+                          <span className="font-semibold text-green-600 dark:text-green-400">{importedImages.length}</span>
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
 
-            {/* Footer */}
-            <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-              <Button className="w-full" size="sm">
-                <Plus className="w-4 h-4 mr-2" />
-                Add Resource
-              </Button>
+                    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                      <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                        Quick Tips
+                      </h4>
+                      <ul className="space-y-2 text-xs text-gray-600 dark:text-gray-400">
+                        <li className="flex items-start gap-2">
+                          <span className="text-purple-600 dark:text-purple-400">•</span>
+                          <span>Drag images from library to canvas</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-blue-600 dark:text-blue-400">•</span>
+                          <span>Click nodes to add them to canvas</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-green-600 dark:text-green-400">•</span>
+                          <span>Select image to edit properties</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-orange-600 dark:text-orange-400">•</span>
+                          <span>Use "Apply to All" for batch edits</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </>
         )}
@@ -438,18 +731,46 @@ export function Sidebar() {
         {/* Collapsed state icons */}
         {!sidebarOpen && (
           <div className="flex flex-col items-center gap-4 p-4">
-            {resourceCategories.map((category) => {
-              const CategoryIcon = category.icon;
-              return (
-                <button
-                  key={category.id}
-                  className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                  title={category.name}
-                >
-                  <CategoryIcon className={cn('w-4 h-4', category.color)} />
-                </button>
-              );
-            })}
+            <button
+              onClick={() => {
+                toggleSidebar();
+                setActiveTab('images');
+              }}
+              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              title="Images"
+            >
+              <Image className="w-4 h-4 text-purple-600" />
+            </button>
+            <button
+              onClick={() => {
+                toggleSidebar();
+                setActiveTab('text');
+              }}
+              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              title="Text"
+            >
+              <Type className="w-4 h-4 text-cyan-600" />
+            </button>
+            <button
+              onClick={() => {
+                toggleSidebar();
+                setActiveTab('nodes');
+              }}
+              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              title="Nodes"
+            >
+              <Layers className="w-4 h-4 text-blue-600" />
+            </button>
+            <button
+              onClick={() => {
+                toggleSidebar();
+                setActiveTab('info');
+              }}
+              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              title="Info"
+            >
+              <Info className="w-4 h-4 text-green-600" />
+            </button>
           </div>
         )}
       </div>

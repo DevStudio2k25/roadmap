@@ -18,6 +18,7 @@ interface RoadmapStore {
   isEditMode: boolean;
   sidebarOpen: boolean;
   currentView: 'canvas' | 'timeline' | 'content';
+  showHandles: boolean;
   
   // Actions for React Flow
   onNodesChange: (changes: any) => void;
@@ -46,6 +47,7 @@ interface RoadmapStore {
   toggleEditMode: () => void;
   toggleSidebar: () => void;
   setCurrentView: (view: 'canvas' | 'timeline' | 'content') => void;
+  toggleHandles: () => void;
   
   // Utility actions
   resetStore: () => void;
@@ -61,6 +63,7 @@ const initialState = {
   isEditMode: false,
   sidebarOpen: true,
   currentView: 'canvas' as const,
+  showHandles: true,
 };
 
 export const useRoadmapStore = create<RoadmapStore>()(
@@ -245,6 +248,10 @@ export const useRoadmapStore = create<RoadmapStore>()(
         
         setCurrentView: (view) => {
           set({ currentView: view });
+        },
+        
+        toggleHandles: () => {
+          set({ showHandles: !get().showHandles });
         },
         
         resetStore: () => {
