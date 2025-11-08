@@ -10,7 +10,6 @@ import {
   BookOpen, 
   FileText,
   Users,
-  Plus,
   Trash2,
   Edit
 } from 'lucide-react';
@@ -110,7 +109,7 @@ export function NodeToolbar() {
             Selected Node
           </h4>
           <div className="text-xs text-gray-600 dark:text-gray-300 mb-2">
-            {(selectedNodeData.data as any)?.title || 'Untitled'}
+            {(selectedNodeData.data as Record<string, unknown>)?.title as string || 'Untitled'}
           </div>
           <div className="flex gap-1">
             <Button

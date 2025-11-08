@@ -5,19 +5,9 @@ import { useRoadmapStore } from '../../lib/stores/roadmap-store';
 import { Type, Palette, Box, Sparkles } from 'lucide-react';
 
 const fontFamilies = [
-  'Inter',
-  'Arial',
-  'Helvetica',
-  'Times New Roman',
-  'Georgia',
-  'Courier New',
-  'Verdana',
-  'Comic Sans MS',
-  'Impact',
-  'Roboto',
-  'Open Sans',
-  'Montserrat',
-  'Poppins'
+  'Inter', 'Arial', 'Helvetica', 'Times New Roman', 'Georgia',
+  'Courier New', 'Verdana', 'Comic Sans MS', 'Impact',
+  'Roboto', 'Open Sans', 'Montserrat', 'Poppins'
 ];
 
 const fontWeights = [
@@ -37,6 +27,23 @@ const shadowOptions = [
   { value: 'xl', label: 'Extra Large' }
 ];
 
+interface TextData {
+  text?: string;
+  fontSize?: number;
+  fontFamily?: string;
+  fontWeight?: string;
+  textColor?: string;
+  backgroundColor?: string;
+  padding?: number;
+  borderRadius?: number;
+  borderWidth?: number;
+  borderColor?: string;
+  textAlign?: string;
+  width?: number;
+  opacity?: number;
+  shadow?: string;
+}
+
 export function TextInspector() {
   const { nodes, selectedNode, updateNode } = useRoadmapStore();
   
@@ -46,10 +53,10 @@ export function TextInspector() {
     return null;
   }
 
-  const data = node.data as Record<string, unknown>;
+  const data = node.data as TextData;
 
   const handleUpdate = (field: string, value: string | number) => {
-    updateNode(node.id, { [field]: value });
+    updateNode(node.id, { [field]: value } as Record<string, unknown>);
   };
 
   return (
@@ -62,7 +69,6 @@ export function TextInspector() {
       </div>
 
       <div className="p-4 space-y-6">
-        {/* Text Content */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Text Content
@@ -76,14 +82,12 @@ export function TextInspector() {
           />
         </div>
 
-        {/* Typography Section */}
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
             <Type className="w-4 h-4" />
             Typography
           </div>
 
-          {/* Font Family */}
           <div>
             <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
               Font Family
@@ -101,7 +105,6 @@ export function TextInspector() {
             </select>
           </div>
 
-          {/* Font Size */}
           <div>
             <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
               Font Size: {data.fontSize || 16}px
@@ -116,7 +119,6 @@ export function TextInspector() {
             />
           </div>
 
-          {/* Font Weight */}
           <div>
             <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
               Font Weight
@@ -134,7 +136,6 @@ export function TextInspector() {
             </select>
           </div>
 
-          {/* Text Align */}
           <div>
             <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
               Text Align
@@ -157,14 +158,12 @@ export function TextInspector() {
           </div>
         </div>
 
-        {/* Colors Section */}
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
             <Palette className="w-4 h-4" />
             Colors
           </div>
 
-          {/* Text Color */}
           <div>
             <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
               Text Color
@@ -186,7 +185,6 @@ export function TextInspector() {
             </div>
           </div>
 
-          {/* Background Color */}
           <div>
             <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
               Background Color
@@ -209,14 +207,12 @@ export function TextInspector() {
           </div>
         </div>
 
-        {/* Layout Section */}
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
             <Box className="w-4 h-4" />
             Layout
           </div>
 
-          {/* Width */}
           <div>
             <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
               Width: {data.width || 200}px
@@ -231,7 +227,6 @@ export function TextInspector() {
             />
           </div>
 
-          {/* Padding */}
           <div>
             <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
               Padding: {data.padding || 16}px
@@ -246,7 +241,6 @@ export function TextInspector() {
             />
           </div>
 
-          {/* Border Radius */}
           <div>
             <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
               Border Radius: {data.borderRadius || 8}px
@@ -262,14 +256,12 @@ export function TextInspector() {
           </div>
         </div>
 
-        {/* Border Section */}
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
             <Box className="w-4 h-4" />
             Border
           </div>
 
-          {/* Border Width */}
           <div>
             <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
               Border Width: {data.borderWidth || 1}px
@@ -284,7 +276,6 @@ export function TextInspector() {
             />
           </div>
 
-          {/* Border Color */}
           <div>
             <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
               Border Color
@@ -307,14 +298,12 @@ export function TextInspector() {
           </div>
         </div>
 
-        {/* Effects Section */}
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
             <Sparkles className="w-4 h-4" />
             Effects
           </div>
 
-          {/* Opacity */}
           <div>
             <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
               Opacity: {Math.round((data.opacity || 1) * 100)}%
@@ -330,7 +319,6 @@ export function TextInspector() {
             />
           </div>
 
-          {/* Shadow */}
           <div>
             <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
               Shadow

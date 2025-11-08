@@ -87,7 +87,7 @@ const getEdgeStyle = (edge: Edge) => {
     markerEnd: {
       type: 'arrowclosed' as const,
       color: strokeColor,
-    } as any,
+    },
   };
 };
 
@@ -124,7 +124,14 @@ export function RoadmapCanvas() {
     const draggingNode = nodes.find(n => n.id === draggingNodeId);
     if (!draggingNode) return [];
 
-    const indicators: any[] = [];
+    const indicators: Array<{
+      x1: number;
+      y1: number;
+      x2: number;
+      y2: number;
+      distance: number;
+      type: string;
+    }> = [];
     const otherNodes = nodes.filter(n => n.id !== draggingNodeId);
 
     const dragX = draggingNode.position.x;
@@ -244,7 +251,7 @@ export function RoadmapCanvas() {
   }, [setSelectedNode]);
 
   const handleDrop = useCallback(
-    (event: React.DragEvent) => {
+    async (event: React.DragEvent) => {
       event.preventDefault();
       
       const imageData = event.dataTransfer.getData('imageData');
@@ -253,8 +260,7 @@ export function RoadmapCanvas() {
           const img = JSON.parse(imageData);
           
           // Import smart positioning
-          const canvasHelpers = await import('../../lib/utils/canvas-helpers');
-          const { findBestPosition } = canvasHelpers;
+          const { findBestPosition } = await import('../../lib/utils/canvas-helpers');
           
           // Find best position for new image
           const position = findBestPosition(nodes, img.width, img.height);
@@ -385,7 +391,6 @@ export function RoadmapCanvas() {
           strokeWidth: 2.5,
           strokeLinecap: 'round' as const,
         }}
-        connectionLineType={'smoothstep' as any}
         snapToGrid={true}
         snapGrid={[20, 20]}
       >

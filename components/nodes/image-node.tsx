@@ -133,6 +133,7 @@ export function ImageNode({ data, selected, id }: NodeProps) {
 
       {/* Image */}
       <div className="relative">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={imageUrl}
           alt={imageName}

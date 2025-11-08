@@ -28,8 +28,7 @@ export function TreeNode({ data, selected }: NodeProps) {
     avatar, 
     status = 'active', 
     children = 0, 
-    expanded = false,
-    level = 0
+    expanded = false
   } = nodeData;
 
   const getTypeIcon = (type: string) => {

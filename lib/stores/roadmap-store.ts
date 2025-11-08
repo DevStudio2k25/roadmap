@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { Node, Edge, Connection, addEdge, applyNodeChanges, applyEdgeChanges } from '@xyflow/react';
+import { Node, Edge, Connection, addEdge, applyNodeChanges, applyEdgeChanges, NodeChange, EdgeChange } from '@xyflow/react';
 import { RoadmapNode, Resource, Post, LearningPath } from '@/lib/types';
 
 interface RoadmapStore {
@@ -73,15 +73,15 @@ export const useRoadmapStore = create<RoadmapStore>()(
         ...initialState,
         
         // React Flow actions
-        onNodesChange: (changes) => {
+        onNodesChange: (changes: unknown[]) => {
           set({
-            nodes: applyNodeChanges(changes, get().nodes),
+            nodes: applyNodeChanges(changes as NodeChange<Node>[], get().nodes),
           });
         },
         
-        onEdgesChange: (changes) => {
+        onEdgesChange: (changes: unknown[]) => {
           set({
-            edges: applyEdgeChanges(changes, get().edges),
+            edges: applyEdgeChanges(changes as EdgeChange<Edge>[], get().edges),
           });
         },
         

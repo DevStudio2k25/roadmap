@@ -225,6 +225,7 @@ export function Sidebar() {
                               }}
                               title="Drag to canvas"
                             >
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
                                 src={img.url}
                                 alt={img.name || 'Imported image'}
@@ -649,7 +650,7 @@ export function Sidebar() {
                         </li>
                         <li className="flex items-start gap-2">
                           <span className="text-orange-600 dark:text-orange-400">•</span>
-                          <span>Use "Apply to All" for batch edits</span>
+                          <span>Use &quot;Apply to All&quot; for batch edits</span>
                         </li>
                       </ul>
                     </div>
