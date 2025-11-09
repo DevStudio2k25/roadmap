@@ -408,6 +408,43 @@ export function Sidebar() {
                           <div className="text-sm text-gray-600 bg-yellow-100 border border-yellow-300 rounded p-2 mb-1">Note</div>
                           <p className="text-xs text-gray-500">Sticky note style</p>
                         </button>
+
+                        {/* Tree Structure Preset */}
+                        <button
+                          onClick={() => {
+                            const timestamp = Date.now();
+                            addNode({
+                              id: `tree-text-${timestamp}`,
+                              type: 'treeText',
+                              position: { x: 250, y: 150 },
+                              data: {
+                                rootText: 'Tree Structure',
+                                tree: [],
+                                createdAt: new Date(timestamp),
+                                updatedAt: new Date(timestamp),
+                              },
+                            });
+                          }}
+                          className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-300 transition-all text-left"
+                        >
+                          <div className="bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800 rounded-lg p-2 mb-1 font-mono text-xs">
+                            <div className="flex items-center gap-1 text-teal-900 dark:text-teal-100 font-semibold mb-1">
+                              <div className="w-2 h-2 rounded-full bg-teal-500"></div>
+                              Root
+                            </div>
+                            <div className="ml-3 space-y-0.5">
+                              <div className="flex items-center gap-1 text-teal-700 dark:text-teal-300">
+                                <div className="w-1.5 h-1.5 rounded-full bg-teal-400"></div>
+                                Child 1
+                              </div>
+                              <div className="flex items-center gap-1 text-teal-700 dark:text-teal-300">
+                                <div className="w-1.5 h-1.5 rounded-full bg-teal-400"></div>
+                                Child 2
+                              </div>
+                            </div>
+                          </div>
+                          <p className="text-xs text-gray-500">Firebase-like tree</p>
+                        </button>
                       </div>
                     </div>
                   </div>

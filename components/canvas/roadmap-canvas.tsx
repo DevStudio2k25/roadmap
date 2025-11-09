@@ -23,6 +23,7 @@ import { TreeNode } from '../nodes/tree-node';
 import { TableNode } from '../nodes/table-node';
 import { ImageNode } from '../nodes/image-node';
 import { TextNode } from '../nodes/text-node';
+import { TreeTextNode } from '../nodes/tree-text-node';
 import { CanvasControls } from './canvas-controls';
 import { PermanentSpacing } from './permanent-spacing';
 
@@ -36,6 +37,7 @@ const nodeTypes = {
   table: TableNode,
   image: ImageNode,
   text: TextNode,
+  treeText: TreeTextNode,
 };
 
 const defaultEdgeOptions = {

@@ -124,16 +124,17 @@ export function TableNode({ data, selected }: NodeProps) {
 
   const addRow = useCallback(() => {
     const newRowId = `row-${Date.now()}`;
+    const currentColumnCount = localRows[0]?.cells.length || 3;
     const newRow: TableRow = {
       id: newRowId,
-      cells: Array.from({ length: columns }, (_, i) => ({
+      cells: Array.from({ length: currentColumnCount }, (_, i) => ({
         id: `${newRowId}-${i}`,
         content: '',
         isHeader: false
       }))
     };
     setLocalRows(prev => [...prev, newRow]);
-  }, [columns]);
+  }, [localRows]);
 
   const addColumn = useCallback(() => {
     setLocalRows(prev => prev.map(row => ({
@@ -173,8 +174,8 @@ export function TableNode({ data, selected }: NodeProps) {
   return (
     <div
       className={cn(
-        'bg-white border-2 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 min-w-[300px] max-w-[600px] overflow-hidden group',
-        selected ? 'border-purple-400 ring-2 ring-purple-100' : 'border-gray-200 hover:border-gray-300'
+        'bg-white dark:bg-gray-800 border-2 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 min-w-[300px] max-w-[600px] overflow-hidden group',
+        selected ? 'border-teal-400 ring-2 ring-teal-100' : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'
       )}
     >
       {/* Input Handles */}
@@ -184,35 +185,30 @@ export function TableNode({ data, selected }: NodeProps) {
             type="target"
             position={Position.Top}
             id="input-1"
-            className="w-3 h-3 bg-purple-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            className="w-3 h-3 bg-teal-500 border-2 border-white rounded-full hover:scale-125 transition-all"
             style={{ left: '25%' }}
           />
           <Handle
             type="target"
             position={Position.Top}
             id="input-2"
-            className="w-3 h-3 bg-purple-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            className="w-3 h-3 bg-teal-500 border-2 border-white rounded-full hover:scale-125 transition-all"
             style={{ left: '75%' }}
           />
           <Handle
             type="target"
             position={Position.Left}
             id="input-left"
-            className="w-3 h-3 bg-purple-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            className="w-3 h-3 bg-teal-500 border-2 border-white rounded-full hover:scale-125 transition-all"
           />
         </>
       )}
       
       {/* Header */}
-      <div className={cn(
-        "px-4 py-3 border-b border-gray-200",
-        isEditing 
-          ? "bg-gradient-to-r from-blue-100 to-purple-100 border-blue-200" 
-          : "bg-gradient-to-r from-purple-50 to-blue-50"
-      )}>
+      <div className="px-4 py-3 bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-900/20 dark:to-emerald-900/20 border-b border-teal-200 dark:border-teal-700">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-500 rounded-lg">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-teal-500 rounded-lg">
               <Table className="w-4 h-4 text-white" />
             </div>
             <div>
@@ -257,7 +253,7 @@ export function TableNode({ data, selected }: NodeProps) {
                   </div>
                 ) : (
                   <h3 
-                    className="font-semibold text-gray-900 text-sm flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors"
+                    className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-2 cursor-pointer hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
                     onClick={handleTitleEdit}
                     title="Click to edit table name"
                   >
@@ -288,10 +284,10 @@ export function TableNode({ data, selected }: NodeProps) {
                 setIsEditing(!isEditing);
               }}
               className={cn(
-                "h-8 px-3 text-xs font-medium",
+                "h-7 px-2 text-xs font-medium",
                 isEditing 
-                  ? "bg-blue-600 text-white hover:bg-blue-700" 
-                  : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                  ? "bg-teal-600 text-white hover:bg-teal-700" 
+                  : "border-teal-300 dark:border-teal-600 text-teal-700 dark:text-teal-300 hover:bg-teal-50 dark:hover:bg-teal-900/20"
               )}
             >
               {isEditing ? (
@@ -327,6 +323,27 @@ export function TableNode({ data, selected }: NodeProps) {
             'w-full text-sm',
             getTableStyles()
           )}>
+            {/* Column Delete Buttons Row */}
+            {isEditing && localRows[0]?.cells.length > 1 && (
+              <thead>
+                <tr>
+                  {localRows[0]?.cells.map((_, colIndex) => (
+                    <th key={`col-delete-${colIndex}`} className="px-3 py-1 text-center relative">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removeColumn(colIndex)}
+                        className="h-5 w-5 p-0 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700 hover:bg-red-100 dark:hover:bg-red-900/40 mx-auto"
+                        title="Remove Column"
+                      >
+                        <X className="w-3 h-3 text-red-600 dark:text-red-400" />
+                      </Button>
+                    </th>
+                  ))}
+                  {localRows.length > 1 && <th className="w-6"></th>}
+                </tr>
+              </thead>
+            )}
             <tbody>
               {localRows.map((row) => (
                 <tr 
@@ -334,8 +351,8 @@ export function TableNode({ data, selected }: NodeProps) {
                   className={cn(
                     'transition-colors',
                     row.cells[0]?.isHeader 
-                      ? 'bg-gray-50 border-b-2 border-gray-200' 
-                      : 'hover:bg-gray-50 border-b border-gray-100'
+                      ? 'bg-white dark:bg-gray-800 border-b-2 border-gray-300 dark:border-gray-600' 
+                      : 'hover:bg-teal-50/30 dark:hover:bg-teal-900/10 border-b border-gray-200 dark:border-gray-700'
                   )}
                 >
                   {row.cells.map((cell, cellIndex) => {
@@ -348,8 +365,8 @@ export function TableNode({ data, selected }: NodeProps) {
                         className={cn(
                           'px-3 py-2 text-left relative group min-w-[80px]',
                           cell.isHeader 
-                            ? 'font-semibold text-gray-900 bg-gray-50' 
-                            : 'text-gray-700'
+                            ? 'font-semibold text-gray-900 dark:text-white bg-white dark:bg-gray-800' 
+                            : 'text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800'
                         )}
                       >
                         {isEditingThisCell ? (
@@ -412,7 +429,7 @@ export function TableNode({ data, selected }: NodeProps) {
                           <div 
                             className={cn(
                               "min-h-[20px] flex items-center px-1 py-1 rounded",
-                              isEditing ? "cursor-pointer hover:bg-blue-50 hover:border hover:border-blue-200" : "cursor-default"
+                              isEditing ? "cursor-pointer hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border hover:border-teal-200 dark:hover:border-teal-700" : "cursor-default"
                             )}
                             onClick={() => isEditing && handleCellEdit(cell.id, cell.content)}
                             title={isEditing ? "Click to edit" : ""}
@@ -428,38 +445,23 @@ export function TableNode({ data, selected }: NodeProps) {
                           </div>
                         )}
 
-                        {/* Column controls */}
-                        {isEditing && cellIndex === row.cells.length - 1 && localRows[0]?.cells.length > 1 && (
-                          <div className="absolute -right-6 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => removeColumn(cellIndex)}
-                              className="h-5 w-5 p-0 bg-red-50 border-red-200 hover:bg-red-100"
-                              title="Remove Column"
-                            >
-                              <X className="w-3 h-3 text-red-600" />
-                            </Button>
-                          </div>
-                        )}
+
                       </CellComponent>
                     );
                   })}
                   
                   {/* Row controls */}
                   {isEditing && localRows.length > 1 && (
-                    <td className="px-1 py-1 w-6">
-                      <div className="flex justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => removeRow(row.id)}
-                          className="h-5 w-5 p-0 bg-red-50 border-red-200 hover:bg-red-100"
-                          title="Remove Row"
-                        >
-                          <X className="w-3 h-3 text-red-600" />
-                        </Button>
-                      </div>
+                    <td className="px-1 py-1 w-6 text-center">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removeRow(row.id)}
+                        className="h-5 w-5 p-0 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700 hover:bg-red-100 dark:hover:bg-red-900/40 mx-auto"
+                        title="Remove Row"
+                      >
+                        <X className="w-3 h-3 text-red-600 dark:text-red-400" />
+                      </Button>
                     </td>
                   )}
                 </tr>
@@ -470,8 +472,8 @@ export function TableNode({ data, selected }: NodeProps) {
 
         {/* Table Controls - Always Visible */}
         <div className={cn(
-          "mt-4 pt-3 border-t border-gray-200 -mx-4 px-4 pb-2",
-          isEditing ? "bg-blue-50" : "bg-gray-50"
+          "mt-4 pt-3 border-t border-gray-200 dark:border-gray-700 -mx-4 px-4 pb-2",
+          isEditing ? "bg-teal-50 dark:bg-teal-900/20" : "bg-gray-50 dark:bg-gray-900"
         )}>
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
@@ -481,8 +483,8 @@ export function TableNode({ data, selected }: NodeProps) {
                 onClick={addRow}
                 disabled={!isEditing}
                 className={cn(
-                  "h-7 px-3 text-xs bg-white",
-                  isEditing ? "hover:bg-blue-50 border-blue-200" : "opacity-50"
+                  "h-7 px-3 text-xs",
+                  isEditing ? "hover:bg-teal-50 dark:hover:bg-teal-900/20 border-teal-200 dark:border-teal-700 text-teal-700 dark:text-teal-300" : "opacity-50"
                 )}
               >
                 <Plus className="w-3 h-3 mr-1" />
@@ -494,24 +496,24 @@ export function TableNode({ data, selected }: NodeProps) {
                 onClick={addColumn}
                 disabled={!isEditing}
                 className={cn(
-                  "h-7 px-3 text-xs bg-white",
-                  isEditing ? "hover:bg-blue-50 border-blue-200" : "opacity-50"
+                  "h-7 px-3 text-xs",
+                  isEditing ? "hover:bg-teal-50 dark:hover:bg-teal-900/20 border-teal-200 dark:border-teal-700 text-teal-700 dark:text-teal-300" : "opacity-50"
                 )}
               >
                 <Plus className="w-3 h-3 mr-1" />
                 Add Column
               </Button>
             </div>
-            <div className="text-xs text-gray-500 bg-white px-2 py-1 rounded border">
+            <div className="text-xs text-gray-600 dark:text-gray-400 px-2 py-1 rounded border border-gray-300 dark:border-gray-600">
               {localRows.length} rows × {localRows[0]?.cells.length || 0} columns
             </div>
           </div>
           {isEditing ? (
-            <div className="text-xs text-blue-700 text-center font-medium">
+            <div className="text-xs text-teal-700 dark:text-teal-300 text-center font-medium">
               ✏️ Edit Mode Active • Click cells to edit • Use buttons to add/remove
             </div>
           ) : (
-            <div className="text-xs text-gray-500 text-center">
+            <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
               Click &quot;Edit&quot; button to modify table structure and content
             </div>
           )}
@@ -525,21 +527,21 @@ export function TableNode({ data, selected }: NodeProps) {
             type="source"
             position={Position.Bottom}
             id="output-1"
-            className="w-3 h-3 bg-purple-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            className="w-3 h-3 bg-emerald-500 border-2 border-white rounded-full hover:scale-125 transition-all"
             style={{ left: '25%' }}
           />
           <Handle
             type="source"
             position={Position.Bottom}
             id="output-2"
-            className="w-3 h-3 bg-purple-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            className="w-3 h-3 bg-emerald-500 border-2 border-white rounded-full hover:scale-125 transition-all"
             style={{ left: '75%' }}
           />
           <Handle
             type="source"
             position={Position.Right}
             id="output-right"
-            className="w-3 h-3 bg-purple-500 border-2 border-white rounded-full hover:scale-125 transition-all"
+            className="w-3 h-3 bg-emerald-500 border-2 border-white rounded-full hover:scale-125 transition-all"
           />
         </>
       )}
