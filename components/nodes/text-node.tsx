@@ -18,10 +18,16 @@ interface TextNodeData {
   borderWidth?: number;
   borderColor?: string;
   textAlign?: 'left' | 'center' | 'right';
+  verticalAlign?: 'top' | 'middle' | 'bottom';
   width?: number;
   height?: number;
   opacity?: number;
   shadow?: string;
+  customHandles?: Array<{
+    id: string;
+    type: 'source' | 'target';
+    position: 'top' | 'bottom' | 'left' | 'right';
+  }>;
 }
 
 export function TextNode({ data, selected, id }: NodeProps) {
@@ -39,7 +45,9 @@ export function TextNode({ data, selected, id }: NodeProps) {
     borderWidth = 1,
     borderColor = '#e5e7eb',
     textAlign = 'left',
+    verticalAlign = 'top',
     width = 200,
+    height,
     opacity = 1,
     shadow = 'sm'
   } = nodeData;
@@ -66,6 +74,7 @@ export function TextNode({ data, selected, id }: NodeProps) {
       )}
       style={{ 
         width: `${width}px`,
+        height: height ? `${height}px` : 'auto',
         backgroundColor,
         padding: `${padding}px`,
         borderRadius: `${borderRadius}px`,
@@ -74,53 +83,113 @@ export function TextNode({ data, selected, id }: NodeProps) {
         minHeight: '40px'
       }}
     >
-      {/* Input Handles */}
-      {showHandles && (
-        <>
-          <Handle
-            type="target"
-            position={Position.Top}
-            id="top"
-            className="!w-4 !h-4 !bg-gradient-to-br !from-blue-500 !to-cyan-600 !border-2 !border-white rounded-full shadow-lg hover:scale-125 transition-all"
-            style={{ top: -8 }}
-          />
-          <Handle
-            type="target"
-            position={Position.Left}
-            id="left"
-            className="!w-4 !h-4 !bg-gradient-to-br !from-blue-500 !to-cyan-600 !border-2 !border-white rounded-full shadow-lg hover:scale-125 transition-all"
-            style={{ left: -8 }}
-          />
-          <Handle
-            type="target"
-            position={Position.Right}
-            id="right-target"
-            className="!w-4 !h-4 !bg-gradient-to-br !from-blue-500 !to-cyan-600 !border-2 !border-white rounded-full shadow-lg hover:scale-125 transition-all"
-            style={{ right: -8 }}
-          />
-          <Handle
-            type="target"
-            position={Position.Bottom}
-            id="bottom-target"
-            className="!w-4 !h-4 !bg-gradient-to-br !from-blue-500 !to-cyan-600 !border-2 !border-white rounded-full shadow-lg hover:scale-125 transition-all"
-            style={{ bottom: -8 }}
-          />
-        </>
-      )}
+      {/* Custom Handles with Dynamic Spacing - Fixed positioning */}
+      {showHandles && nodeData.customHandles && (() => {
+        const positionMap = {
+          top: Position.Top,
+          bottom: Position.Bottom,
+          left: Position.Left,
+          right: Position.Right
+        };
+        
+        // Group handles by position
+        const handlesByPosition = nodeData.customHandles.reduce((acc, handle) => {
+          if (!acc[handle.position]) acc[handle.position] = [];
+          acc[handle.position].push(handle);
+          return acc;
+        }, {} as Record<string, typeof nodeData.customHandles>);
 
-      {/* Text Content */}
+        return nodeData.customHandles.map((handle) => {
+          const handlesAtPosition = handlesByPosition[handle.position];
+          const indexAtPosition = handlesAtPosition.indexOf(handle);
+          const totalAtPosition = handlesAtPosition.length;
+          
+          // Calculate position based on number of handles
+          // Use percentage for even distribution
+          let handlePosition: string | number;
+          
+          if (handle.position === 'top' || handle.position === 'bottom') {
+            // Horizontal positioning - distribute evenly across width
+            if (totalAtPosition === 1) {
+              handlePosition = '50%';
+            } else {
+              // Evenly space handles: 1/(n+1), 2/(n+1), 3/(n+1), etc.
+              const fraction = (indexAtPosition + 1) / (totalAtPosition + 1);
+              handlePosition = `${fraction * 100}%`;
+            }
+            
+            return (
+              <Handle
+                key={handle.id}
+                type={handle.type}
+                position={positionMap[handle.position]}
+                id={handle.id}
+                className={cn(
+                  '!w-4 !h-4 !border-2 !border-white rounded-full shadow-lg hover:scale-125 transition-all',
+                  handle.type === 'source' 
+                    ? '!bg-[#10b981]' 
+                    : '!bg-[#3b82f6]'
+                )}
+                style={{
+                  left: handlePosition,
+                  [handle.position]: '-8px',
+                }}
+              />
+            );
+          } else {
+            // Vertical positioning - distribute evenly across height
+            if (totalAtPosition === 1) {
+              handlePosition = '50%';
+            } else {
+              const fraction = (indexAtPosition + 1) / (totalAtPosition + 1);
+              handlePosition = `${fraction * 100}%`;
+            }
+            
+            return (
+              <Handle
+                key={handle.id}
+                type={handle.type}
+                position={positionMap[handle.position]}
+                id={handle.id}
+                className={cn(
+                  '!w-4 !h-4 !border-2 !border-white rounded-full shadow-lg hover:scale-125 transition-all',
+                  handle.type === 'source' 
+                    ? '!bg-[#10b981]' 
+                    : '!bg-[#3b82f6]'
+                )}
+                style={{
+                  top: handlePosition,
+                  [handle.position]: '-8px',
+                }}
+              />
+            );
+          }
+        });
+      })()}
+
+      {/* Text Content with Vertical Alignment */}
       <div
         style={{
-          fontSize: `${fontSize}px`,
-          fontFamily,
-          fontWeight,
-          color: textColor,
-          textAlign,
-          wordWrap: 'break-word',
-          whiteSpace: 'pre-wrap'
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: verticalAlign === 'top' ? 'flex-start' : verticalAlign === 'middle' ? 'center' : 'flex-end',
+          height: '100%',
+          width: '100%'
         }}
       >
-        {text}
+        <div
+          style={{
+            fontSize: `${fontSize}px`,
+            fontFamily,
+            fontWeight,
+            color: textColor,
+            textAlign,
+            wordWrap: 'break-word',
+            whiteSpace: 'pre-wrap'
+          }}
+        >
+          {text}
+        </div>
       </div>
 
       {/* Delete Button */}
@@ -134,39 +203,7 @@ export function TextNode({ data, selected, id }: NodeProps) {
         </button>
       )}
 
-      {/* Output Handles */}
-      {showHandles && (
-        <>
-          <Handle
-            type="source"
-            position={Position.Top}
-            id="top-source"
-            className="!w-4 !h-4 !bg-gradient-to-br !from-emerald-500 !to-teal-600 !border-2 !border-white rounded-full shadow-lg hover:scale-125 transition-all"
-            style={{ top: -8 }}
-          />
-          <Handle
-            type="source"
-            position={Position.Bottom}
-            id="bottom"
-            className="!w-4 !h-4 !bg-gradient-to-br !from-emerald-500 !to-teal-600 !border-2 !border-white rounded-full shadow-lg hover:scale-125 transition-all"
-            style={{ bottom: -8 }}
-          />
-          <Handle
-            type="source"
-            position={Position.Left}
-            id="left-source"
-            className="!w-4 !h-4 !bg-gradient-to-br !from-emerald-500 !to-teal-600 !border-2 !border-white rounded-full shadow-lg hover:scale-125 transition-all"
-            style={{ left: -8 }}
-          />
-          <Handle
-            type="source"
-            position={Position.Right}
-            id="right"
-            className="!w-4 !h-4 !bg-gradient-to-br !from-emerald-500 !to-teal-600 !border-2 !border-white rounded-full shadow-lg hover:scale-125 transition-all"
-            style={{ right: -8 }}
-          />
-        </>
-      )}
+
     </div>
   );
 }

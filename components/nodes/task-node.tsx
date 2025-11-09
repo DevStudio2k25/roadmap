@@ -12,6 +12,11 @@ interface TaskNodeData {
   priority?: 'low' | 'medium' | 'high';
   assignee?: string;
   estimatedTime?: string;
+  customHandles?: Array<{
+    id: string;
+    type: 'source' | 'target';
+    position: 'top' | 'bottom' | 'left' | 'right';
+  }>;
 }
 
 import { useRoadmapStore } from '../../lib/stores/roadmap-store';
@@ -96,31 +101,49 @@ export function TaskNode({ data, selected }: NodeProps) {
         priorityConfig.bgColor
       )}
     >
-      {/* Input Handles */}
-      {showHandles && (
-        <>
-          <Handle
-            type="target"
-            position={Position.Top}
-            id="input-1"
-            className="w-3 h-3 bg-green-500 border-2 border-white rounded-full hover:scale-125 transition-all"
-            style={{ left: '30%' }}
-          />
-          <Handle
-            type="target"
-            position={Position.Top}
-            id="input-2"
-            className="w-3 h-3 bg-green-500 border-2 border-white rounded-full hover:scale-125 transition-all"
-            style={{ left: '70%' }}
-          />
-          <Handle
-            type="target"
-            position={Position.Left}
-            id="input-left"
-            className="w-3 h-3 bg-green-500 border-2 border-white rounded-full hover:scale-125 transition-all"
-          />
-        </>
-      )}
+      {/* Custom Handles with Dynamic Spacing */}
+      {showHandles && nodeData.customHandles && (() => {
+        const positionMap = {
+          top: Position.Top,
+          bottom: Position.Bottom,
+          left: Position.Left,
+          right: Position.Right
+        };
+        
+        const handlesByPosition = nodeData.customHandles.reduce((acc, handle) => {
+          if (!acc[handle.position]) acc[handle.position] = [];
+          acc[handle.position].push(handle);
+          return acc;
+        }, {} as Record<string, typeof nodeData.customHandles>);
+
+        return nodeData.customHandles.map((handle) => {
+          const handlesAtPosition = handlesByPosition[handle.position];
+          const indexAtPosition = handlesAtPosition.indexOf(handle);
+          const totalAtPosition = handlesAtPosition.length;
+          
+          const spacing = 100 / (totalAtPosition + 1);
+          const offset = spacing * (indexAtPosition + 1);
+          
+          const isVertical = handle.position === 'top' || handle.position === 'bottom';
+          const style = isVertical ? { left: `${offset}%` } : { top: `${offset}%` };
+          
+          return (
+            <Handle
+              key={handle.id}
+              type={handle.type}
+              position={positionMap[handle.position]}
+              id={handle.id}
+              className={cn(
+                'w-3 h-3 border-2 border-white rounded-full hover:scale-125 transition-all',
+                handle.type === 'source' ? 'bg-emerald-500' : 'bg-blue-500'
+              )}
+              style={style}
+              isConnectableStart={handle.type === 'source'}
+              isConnectableEnd={handle.type === 'target'}
+            />
+          );
+        });
+      })()}
       
       {/* Header */}
       <div className="px-4 py-3 bg-white border-b border-gray-100">
@@ -172,31 +195,7 @@ export function TaskNode({ data, selected }: NodeProps) {
         </div>
       </div>
       
-      {/* Output Handles */}
-      {showHandles && (
-        <>
-          <Handle
-            type="source"
-            position={Position.Bottom}
-            id="output-1"
-            className="w-3 h-3 bg-green-500 border-2 border-white rounded-full hover:scale-125 transition-all"
-            style={{ left: '30%' }}
-          />
-          <Handle
-            type="source"
-            position={Position.Bottom}
-            id="output-2"
-            className="w-3 h-3 bg-green-500 border-2 border-white rounded-full hover:scale-125 transition-all"
-            style={{ left: '70%' }}
-          />
-          <Handle
-            type="source"
-            position={Position.Right}
-            id="output-right"
-            className="w-3 h-3 bg-green-500 border-2 border-white rounded-full hover:scale-125 transition-all"
-          />
-        </>
-      )}
+
     </div>
   );
 }

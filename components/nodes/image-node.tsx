@@ -19,6 +19,11 @@ interface ImageNodeData {
   shadow?: string;
   borderWidth?: number;
   borderColor?: string;
+  customHandles?: Array<{
+    id: string;
+    type: 'source' | 'target';
+    position: 'top' | 'bottom' | 'left' | 'right';
+  }>;
 }
 
 export function ImageNode({ data, selected, id }: NodeProps) {
@@ -83,53 +88,87 @@ export function ImageNode({ data, selected, id }: NodeProps) {
         border: borderWidth > 0 ? `${borderWidth}px solid ${borderColor}` : 'none',
       }}
     >
-      {/* Input Handles - Top */}
-      {showHandles && (
-        <Handle
-          type="target"
-          position={Position.Top}
-          id="top"
-          className="!w-5 !h-5 !bg-gradient-to-br !from-indigo-500 !to-purple-600 !border-3 !border-white rounded-full shadow-xl hover:scale-125 transition-all duration-200 cursor-pointer"
-          style={{ top: -10, zIndex: 10 }}
-          onMouseEnter={() => console.log('🟣 Top Input Handle Hover')}
-        />
-      )}
-      
-      {/* Input Handles - Left */}
-      {showHandles && (
-        <Handle
-          type="target"
-          position={Position.Left}
-          id="left"
-          className="!w-5 !h-5 !bg-gradient-to-br !from-indigo-500 !to-purple-600 !border-3 !border-white rounded-full shadow-xl hover:scale-125 transition-all duration-200 cursor-pointer"
-          style={{ left: -10, zIndex: 10 }}
-          onMouseEnter={() => console.log('🟣 Left Input Handle Hover')}
-        />
-      )}
-      
-      {/* Input Handles - Right */}
-      {showHandles && (
-        <Handle
-          type="target"
-          position={Position.Right}
-          id="right-target"
-          className="!w-5 !h-5 !bg-gradient-to-br !from-indigo-500 !to-purple-600 !border-3 !border-white rounded-full shadow-xl hover:scale-125 transition-all duration-200 cursor-pointer"
-          style={{ right: -10, zIndex: 10 }}
-          onMouseEnter={() => console.log('🟣 Right Input Handle Hover')}
-        />
-      )}
-      
-      {/* Input Handles - Bottom */}
-      {showHandles && (
-        <Handle
-          type="target"
-          position={Position.Bottom}
-          id="bottom-target"
-          className="!w-5 !h-5 !bg-gradient-to-br !from-indigo-500 !to-purple-600 !border-3 !border-white rounded-full shadow-xl hover:scale-125 transition-all duration-200 cursor-pointer"
-          style={{ bottom: -10, zIndex: 10 }}
-          onMouseEnter={() => console.log('🟣 Bottom Input Handle Hover')}
-        />
-      )}
+      {/* Custom Handles with Dynamic Spacing - Fixed positioning */}
+      {showHandles && nodeData.customHandles && (() => {
+        const positionMap = {
+          top: Position.Top,
+          bottom: Position.Bottom,
+          left: Position.Left,
+          right: Position.Right
+        };
+        
+        // Group handles by position
+        const handlesByPosition = nodeData.customHandles.reduce((acc, handle) => {
+          if (!acc[handle.position]) acc[handle.position] = [];
+          acc[handle.position].push(handle);
+          return acc;
+        }, {} as Record<string, typeof nodeData.customHandles>);
+
+        return nodeData.customHandles.map((handle) => {
+          const handlesAtPosition = handlesByPosition[handle.position];
+          const indexAtPosition = handlesAtPosition.indexOf(handle);
+          const totalAtPosition = handlesAtPosition.length;
+          
+          // Calculate position based on number of handles
+          let handlePosition: string | number;
+          
+          if (handle.position === 'top' || handle.position === 'bottom') {
+            // Horizontal positioning - distribute evenly across width
+            if (totalAtPosition === 1) {
+              handlePosition = '50%';
+            } else {
+              const fraction = (indexAtPosition + 1) / (totalAtPosition + 1);
+              handlePosition = `${fraction * 100}%`;
+            }
+            
+            return (
+              <Handle
+                key={handle.id}
+                type={handle.type}
+                position={positionMap[handle.position]}
+                id={handle.id}
+                className={cn(
+                  '!w-4 !h-4 !border-2 !border-white rounded-full shadow-lg hover:scale-125 transition-all',
+                  handle.type === 'source' 
+                    ? '!bg-[#10b981]' 
+                    : '!bg-[#3b82f6]'
+                )}
+                style={{
+                  left: handlePosition,
+                  [handle.position]: '-8px',
+                }}
+              />
+            );
+          } else {
+            // Vertical positioning - distribute evenly across height
+            if (totalAtPosition === 1) {
+              handlePosition = '50%';
+            } else {
+              const fraction = (indexAtPosition + 1) / (totalAtPosition + 1);
+              handlePosition = `${fraction * 100}%`;
+            }
+            
+            return (
+              <Handle
+                key={handle.id}
+                type={handle.type}
+                position={positionMap[handle.position]}
+                id={handle.id}
+                className={cn(
+                  '!w-4 !h-4 !border-2 !border-white rounded-full shadow-lg hover:scale-125 transition-all',
+                  handle.type === 'source' 
+                    ? '!bg-[#10b981]' 
+                    : '!bg-[#3b82f6]'
+                )}
+                style={{
+                  top: handlePosition,
+                  [handle.position]: '-8px',
+                }}
+              />
+            );
+          }
+        });
+      })()}
 
       {/* Image */}
       <div className="relative">
@@ -171,53 +210,7 @@ export function ImageNode({ data, selected, id }: NodeProps) {
         </div>
       </div>
 
-      {/* Output Handles - Top */}
-      {showHandles && (
-        <Handle
-          type="source"
-          position={Position.Top}
-          id="top-source"
-          className="!w-5 !h-5 !bg-gradient-to-br !from-pink-500 !to-rose-600 !border-3 !border-white rounded-full shadow-xl hover:scale-125 transition-all duration-200 cursor-pointer"
-          style={{ top: -10, zIndex: 10 }}
-          onMouseEnter={() => console.log('🩷 Top Output Handle Hover')}
-        />
-      )}
-      
-      {/* Output Handles - Bottom */}
-      {showHandles && (
-        <Handle
-          type="source"
-          position={Position.Bottom}
-          id="bottom"
-          className="!w-5 !h-5 !bg-gradient-to-br !from-pink-500 !to-rose-600 !border-3 !border-white rounded-full shadow-xl hover:scale-125 transition-all duration-200 cursor-pointer"
-          style={{ bottom: -10, zIndex: 10 }}
-          onMouseEnter={() => console.log('🩷 Bottom Output Handle Hover')}
-        />
-      )}
-      
-      {/* Output Handles - Left */}
-      {showHandles && (
-        <Handle
-          type="source"
-          position={Position.Left}
-          id="left-source"
-          className="!w-5 !h-5 !bg-gradient-to-br !from-pink-500 !to-rose-600 !border-3 !border-white rounded-full shadow-xl hover:scale-125 transition-all duration-200 cursor-pointer"
-          style={{ left: -10, zIndex: 10 }}
-          onMouseEnter={() => console.log('🩷 Left Output Handle Hover')}
-        />
-      )}
-      
-      {/* Output Handles - Right */}
-      {showHandles && (
-        <Handle
-          type="source"
-          position={Position.Right}
-          id="right"
-          className="!w-5 !h-5 !bg-gradient-to-br !from-pink-500 !to-rose-600 !border-3 !border-white rounded-full shadow-xl hover:scale-125 transition-all duration-200 cursor-pointer"
-          style={{ right: -10, zIndex: 10 }}
-          onMouseEnter={() => console.log('🩷 Right Output Handle Hover')}
-        />
-      )}
+
     </div>
   );
 }

@@ -17,6 +17,7 @@ import {
   Upload,
   Trash2,
   Users,
+  User,
   Layers,
   Info,
   Type
@@ -293,6 +294,12 @@ export function Sidebar() {
                               width: 200,
                               opacity: 1,
                               shadow: 'md',
+                              customHandles: [
+                                { id: 'top-target-0', type: 'target', position: 'top' },
+                                { id: 'left-target-0', type: 'target', position: 'left' },
+                                { id: 'bottom-source-0', type: 'source', position: 'bottom' },
+                                { id: 'right-source-0', type: 'source', position: 'right' }
+                              ],
                               createdAt: new Date(timestamp),
                               updatedAt: new Date(timestamp),
                             },
@@ -336,6 +343,12 @@ export function Sidebar() {
                                 width: 300,
                                 opacity: 1,
                                 shadow: 'none',
+                                customHandles: [
+                                  { id: 'top-target-0', type: 'target', position: 'top' },
+                                  { id: 'left-target-0', type: 'target', position: 'left' },
+                                  { id: 'bottom-source-0', type: 'source', position: 'bottom' },
+                                  { id: 'right-source-0', type: 'source', position: 'right' }
+                                ],
                               },
                             });
                           }}
@@ -368,6 +381,12 @@ export function Sidebar() {
                                 width: 120,
                                 opacity: 1,
                                 shadow: 'sm',
+                                customHandles: [
+                                  { id: 'top-target-0', type: 'target', position: 'top' },
+                                  { id: 'left-target-0', type: 'target', position: 'left' },
+                                  { id: 'bottom-source-0', type: 'source', position: 'bottom' },
+                                  { id: 'right-source-0', type: 'source', position: 'right' }
+                                ],
                               },
                             });
                           }}
@@ -400,6 +419,12 @@ export function Sidebar() {
                                 width: 250,
                                 opacity: 1,
                                 shadow: 'sm',
+                                customHandles: [
+                                  { id: 'top-target-0', type: 'target', position: 'top' },
+                                  { id: 'left-target-0', type: 'target', position: 'left' },
+                                  { id: 'bottom-source-0', type: 'source', position: 'bottom' },
+                                  { id: 'right-source-0', type: 'source', position: 'right' }
+                                ],
                               },
                             });
                           }}
@@ -609,30 +634,30 @@ export function Sidebar() {
                         Organization
                       </h4>
                       <div className="grid grid-cols-1 gap-2">
-                        {/* Tree Preset */}
+                        {/* Member Preset */}
                         <button
                           onClick={() => handleAddNode('tree')}
                           className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:border-indigo-300 transition-all text-left group"
                         >
                           <div className="flex items-center gap-2 mb-2">
                             <div className="p-1.5 rounded-lg bg-indigo-500">
-                              <Users className="w-3 h-3 text-white" />
+                              <User className="w-3 h-3 text-white" />
                             </div>
-                            <span className="text-sm font-semibold text-gray-900 dark:text-white">Team</span>
+                            <span className="text-sm font-semibold text-gray-900 dark:text-white">Member</span>
                           </div>
                           <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg p-2">
                             <div className="flex items-center gap-2 mb-1">
                               <div className="w-5 h-5 rounded-full bg-indigo-500 flex items-center justify-center">
-                                <span className="text-white text-xs font-bold">T</span>
+                                <span className="text-white text-xs font-bold">M</span>
                               </div>
-                              <div className="text-xs font-medium text-indigo-900 dark:text-indigo-100">Team Lead</div>
+                              <div className="text-xs font-medium text-indigo-900 dark:text-indigo-100">John Doe</div>
                             </div>
                             <div className="flex items-center gap-1">
                               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
                               <span className="text-xs text-indigo-600 dark:text-indigo-400">Active</span>
                             </div>
                           </div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Organization charts</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Team members</p>
                         </button>
                       </div>
                     </div>

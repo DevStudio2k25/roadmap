@@ -19,7 +19,7 @@ import { TaskNode } from '../nodes/task-node';
 import { DecisionNode } from '../nodes/decision-node';
 import { ResourceNode } from '../nodes/resource-node';
 import { ContentNode } from '../nodes/content-node';
-import { TreeNode } from '../nodes/tree-node';
+import { MemberNode } from '../nodes/member-node';
 import { TableNode } from '../nodes/table-node';
 import { ImageNode } from '../nodes/image-node';
 import { TextNode } from '../nodes/text-node';
@@ -33,7 +33,7 @@ const nodeTypes = {
   decision: DecisionNode,
   resource: ResourceNode,
   content: ContentNode,
-  tree: TreeNode,
+  tree: MemberNode,
   table: TableNode,
   image: ImageNode,
   text: TextNode,
@@ -77,6 +77,32 @@ const getEdgeStyle = (edge: Edge) => {
   else if (sourceNode.includes('resource')) strokeColor = colors.resource;
   else if (sourceNode.includes('image')) strokeColor = colors.image;
   
+  // Get manual offset from edge data (user can adjust this)
+  const manualOffset = (edge.data as { offset?: number })?.offset || 0;
+  
+  // Calculate if this is a parallel edge (same source and target as another edge)
+  const edges = useRoadmapStore.getState().edges;
+  const parallelEdges = edges.filter(e => 
+    (e.source === edge.source && e.target === edge.target && e.id !== edge.id)
+  );
+  
+  // Auto offset for parallel edges
+  let autoOffset = 0;
+  if (parallelEdges.length > 0) {
+    // Find this edge's index among parallel edges
+    const allParallelEdges = [...parallelEdges, edge].sort((a, b) => a.id.localeCompare(b.id));
+    const edgeIndex = allParallelEdges.findIndex(e => e.id === edge.id);
+    const totalParallel = allParallelEdges.length;
+    
+    // Calculate offset: spread edges evenly
+    const offsetStep = 30; // 30px gap between parallel edges
+    const centerOffset = (totalParallel - 1) * offsetStep / 2;
+    autoOffset = (edgeIndex * offsetStep - centerOffset);
+  }
+  
+  // Combine auto and manual offset
+  const totalOffset = autoOffset + manualOffset;
+  
   return {
     ...edge,
     animated: true,
@@ -115,6 +141,7 @@ export function RoadmapCanvas() {
 
   const [spacingIndicators, setSpacingIndicators] = React.useState<SpacingIndicator[]>([]);
   const [isDragging, setIsDragging] = React.useState(false);
+  const [selectedEdge, setSelectedEdge] = React.useState<string | null>(null);
 
   // Apply custom styles to edges
   const styledEdges = useMemo(() => {
@@ -250,7 +277,19 @@ export function RoadmapCanvas() {
 
   const onPaneClick = useCallback(() => {
     setSelectedNode(null);
+    setSelectedEdge(null);
   }, [setSelectedNode]);
+
+  const onEdgeClick = useCallback((_event: React.MouseEvent, edge: Edge) => {
+    setSelectedEdge(edge.id);
+    setSelectedNode(null);
+  }, [setSelectedNode]);
+
+  // Prevent self-connections - node cannot connect to itself
+  const isValidConnection = useCallback((connection: { source: string; target: string }) => {
+    // Check if source and target are different nodes
+    return connection.source !== connection.target;
+  }, []);
 
   const handleDrop = useCallback(
     async (event: React.DragEvent) => {
@@ -378,7 +417,9 @@ export function RoadmapCanvas() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        isValidConnection={isValidConnection}
         onNodeClick={onNodeClick}
+        onEdgeClick={onEdgeClick}
         onPaneClick={onPaneClick}
         onNodeDragStart={onNodeDragStart}
         onNodeDrag={onNodeDrag}
@@ -395,6 +436,8 @@ export function RoadmapCanvas() {
         }}
         snapToGrid={true}
         snapGrid={[20, 20]}
+        connectionRadius={30}
+        elevateEdgesOnSelect={true}
       >
         <Background 
           variant={BackgroundVariant.Dots} 
