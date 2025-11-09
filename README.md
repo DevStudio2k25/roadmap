@@ -323,3 +323,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **Built with ❤️ using Next.js, React Flow, and modern web technologies**
+
+> Last updated: January 2025 - Stable version with multi-handle system
